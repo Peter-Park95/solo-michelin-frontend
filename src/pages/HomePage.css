@@ -1,0 +1,65 @@
+/* src/pages/HomePage.css */
+.home-container {
+  max-width: 420px; /* 또는 390~450px 사이 자유 조정 */
+  margin: 0 auto;
+  padding-bottom: 70px; /* 하단탭 여백 */
+  font-family: sans-serif;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  font-size: 20px;
+}
+
+.search-box {
+  padding: 0 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.banner {
+  margin: 16px;
+  padding: 16px;
+  background-color: #222;
+  color: #fff;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.banner img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 16px;
+
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+
+}
+
+.category-item img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+}
