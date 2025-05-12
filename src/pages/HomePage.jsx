@@ -29,7 +29,7 @@ const HomePage = () => {
       <div className="category-grid">
         {["한식", "양식", "중식", "일식", "뷔페", "카페"].map((name, i) => (
           <div className="category-item" key={i}>
-            <img src={`/icons/icon${i + 1}.jpg`} alt={name} />
+            <img src={`/icons/icon${i + 1}.png`} alt={name} />
             <span>{name}</span>
           </div>
         ))}

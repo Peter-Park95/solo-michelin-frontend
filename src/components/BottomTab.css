@@ -1,15 +1,43 @@
 .bottom-tab {
   position: fixed;
   bottom: 0;
-  left: 50%; /* 화면 중앙 기준 */
-  transform: translateX(-50%); /* 정확히 가운데로 이동 */
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
   max-width: 420px;
-
-  height: 60px;
+  height: 70px; /* ⬆️ 기존보다 살짝 키움 */
   background-color: #fff;
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: stretch; /* ⬅️ 세로로 꽉차게 */
   border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  padding: 8px 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.tab-item span.icon {
+  font-size: 20px; /* ✅ 아이콘 크게 */
+}
+
+.tab-item span.label {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.tab-item.active {
+  background-color: #f3f3f3;  /* ✅ 좀 더 넓게 칠해지는 느낌 */
+  font-weight: bold;
+  color: #ff4f4f;
 }
