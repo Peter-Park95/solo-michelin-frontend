@@ -1,0 +1,84 @@
+.mypage {
+  padding: 16px;
+  padding-bottom: 100px;
+  font-family: sans-serif;
+}
+
+.mypage-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.profile-box {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-img {
+  width: 48px;
+  height: 48px;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: #eee;
+  margin-right: 12px;
+}
+
+.profile-info .name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.profile-info .follow {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.restaurant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.restaurant-card {
+  display: flex;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 12px;
+  background-color: #fdfdfd;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.restaurant-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.restaurant-info h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.restaurant-info p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.rating {
+  font-weight: bold;
+  color: #f39c12;
+}
