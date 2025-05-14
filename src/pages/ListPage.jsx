@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ 추가
 import { getMyReviews } from "../api/review";
 import "./ListPage.css";
 
 function ListPage() {
   const [reviews, setReviews] = useState([]);
+  const navigate = useNavigate(); // ✅ 추가
   const userId = 5; // 예시 유저 ID
 
   useEffect(() => {
@@ -44,7 +46,12 @@ function ListPage() {
       </div>
 
       <div className="add-button-wrapper">
-        <button className="add-button">추가하기</button>
+        <button
+          className="add-button"
+          onClick={() => navigate("/add-review")} // ✅ 여기 핵심
+        >
+          추가하기
+        </button>
       </div>
     </div>
   );

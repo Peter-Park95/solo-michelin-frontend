@@ -6,6 +6,7 @@ import SearchPage from "./pages/SearchPage";
 import ListPage from "./pages/ListPage";
 import MyPage from "./pages/MyPage";
 import BottomTab from "./components/BottomTab";
+import ReviewAddPage from "./pages/ReviewAddPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/list" element={<ListPage />} />
             <Route path="/mypage" element={<MyPage />} />
+            <Route path="/add-review" element={<ReviewAddPage />} />
           </Routes>
           <BottomTab />
         </div>
