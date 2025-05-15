@@ -39,7 +39,7 @@ function ListPage() {
               <h4>{review.restaurantName}</h4>
               <p>{review.comment}</p>
               <p className="rating">내 평점: ⭐ {review.rating}</p>
-              <p>가게 평점: ⭐ {review.restaurantAvgRating}</p>
+{/*               <p>가게 평점: ⭐ {review.restaurantAvgRating}</p> */}
             </div>
           </div>
         ))}

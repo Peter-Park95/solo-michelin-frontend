@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 24px;
   font-family: "Pretendard", sans-serif;
+  padding-bottom: 100px;
 }
 
 .review-page h2 {
@@ -16,35 +17,12 @@
 .review-page textarea {
   width: 100%;
   padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 16px;
+  margin: 0 auto 16px auto;
+  display: block;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
-}
-
-.star-rating {
-  font-size: 28px;
-  margin-bottom: 16px;
-}
-
-.star-rating span {
-  cursor: pointer;
-  margin-right: 2px;
-}
-
-.review-page button {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.review-page button:hover {
-  background-color: #dc2626;
+  box-sizing: border-box;
 }
 
 .restaurant-search-list {
@@ -76,7 +54,7 @@
 
 .restaurant-address {
   font-size: 13px;
-  color: #6b7280; /* Tailwind gray-500 */
+  color: #6b7280;
   margin-top: 2px;
 }
 
@@ -96,24 +74,27 @@
   flex: 1;
 }
 
-.selected-restaurant-card .restaurant-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.selected-restaurant-card .restaurant-address {
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
 .restaurant-thumbnail {
   width: 80px;
   height: 80px;
   border-radius: 6px;
   object-fit: cover;
   margin-left: 12px;
+}
+
+.multi-rating-section {
+  margin-top: 12px;
+}
+
+.rating-item {
+  margin-bottom: 10px;
+}
+
+.average-rating-display {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 12px 0;
+  text-align: center;
 }
 
 .submit-button {
@@ -124,9 +105,11 @@
   border-radius: 6px;
   font-size: 15px;
   cursor: pointer;
-  margin-top: 12px;
-
+  margin-top: 16px;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 80px;
 }
