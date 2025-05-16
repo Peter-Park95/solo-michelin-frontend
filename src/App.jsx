@@ -7,6 +7,7 @@ import ListPage from "./pages/ListPage";
 import MyPage from "./pages/MyPage";
 import BottomTab from "./components/BottomTab";
 import ReviewAddPage from "./pages/ReviewAddPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 function App() {
   return (
@@ -17,8 +18,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/list" element={<ListPage />} />
-            <Route path="/mypage" element={<MyPage />} />
             <Route path="/add-review" element={<ReviewAddPage />} />
+             <Route path="/mypage" element={<MyPage />} />
+             <Route path="/edit-profile" element={<EditProfilePage />} />
           </Routes>
           <BottomTab />
         </div>

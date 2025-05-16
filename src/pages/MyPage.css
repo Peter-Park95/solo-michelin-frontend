@@ -82,3 +82,29 @@
   font-weight: bold;
   color: #f39c12;
 }
+.edit-profile {
+  margin-left: auto;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.edit-profile:hover {
+  background-color: #f5f5f5;
+}
+
+.name-region-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.region {
+  font-size: 13px;
+  color: #888; /* ✅ follow 글자와 통일 */
+  margin-left: 4px;
+}
