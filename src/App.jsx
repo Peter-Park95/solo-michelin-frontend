@@ -1,13 +1,13 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/home/HomePage";
 import SearchPage from "./pages/SearchPage";
-import ListPage from "./pages/ListPage";
-import MyPage from "./pages/MyPage";
+import ListPage from "./pages/review/ListPage";
+import MyPage from "./pages/user/MyPage";
 import BottomTab from "./components/BottomTab";
-import ReviewAddPage from "./pages/ReviewAddPage";
-import EditProfilePage from "./pages/EditProfilePage";
+import ReviewAddPage from "./pages/review/ReviewAddPage";
+import EditProfilePage from "./pages/user/EditProfilePage";
 
 function App() {
   return (
