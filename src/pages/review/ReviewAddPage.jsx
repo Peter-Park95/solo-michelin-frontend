@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StarRating from '../../components/StarRating';
 import './ReviewAddPage.css';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function ReviewAddPage() {
   const [search, setSearch] = useState('');
@@ -13,6 +13,8 @@ function ReviewAddPage() {
   const [moodRating, setMoodRating] = useState(0);
   const [serviceRating, setServiceRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [imageFile, setImageFile] = useState(null); // 이미지 파일
+  const [imagePreview, setImagePreview] = useState(null); // 미리보기 URL
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +36,6 @@ function ReviewAddPage() {
     e.preventDefault();
 
     const ratings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
-
     if (!selectedRestaurant || ratings.length === 0) {
       alert('음식점과 최소 1개 이상의 별점을 입력해주세요!');
       return;
@@ -44,14 +45,25 @@ function ReviewAddPage() {
     const finalRating = Math.ceil(avg * 10) / 10;
 
     try {
-      await axios.post('/api/reviews', {
-        userId: 5, // 향후 로그인 기능 구현시 수정
+      const formData = new FormData();
+      const reviewData = {
+        userId: 5, // 추후 로그인 연동 예정
         restaurantId: selectedRestaurant.id,
         rating: finalRating,
         comment,
+      };
+
+      formData.append('request', new Blob([JSON.stringify(reviewData)], { type: 'application/json' }));
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+
+      await axios.post('/api/reviews', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
+
       alert('리뷰가 저장되었습니다!');
-      navigate('/list')
+      navigate('/list');
     } catch (error) {
       console.error('리뷰 저장 실패:', error);
       alert('리뷰 저장 중 오류가 발생했습니다.');
@@ -130,6 +142,37 @@ function ReviewAddPage() {
               <label>서비스</label>
               <StarRating rating={serviceRating} setRating={setServiceRating} />
             </div>
+          </div>
+
+          {/* 📸 이미지 업로드 버튼 */}
+          <div className="image-upload-section">
+            <button
+              type="button"
+              className="image-upload-button"
+              onClick={() => document.getElementById('review-image-input').click()}
+            >
+              📷 사진 추가하기
+            </button>
+
+            <input
+              type="file"
+              accept="image/*"
+              id="review-image-input"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setImageFile(file);
+                  setImagePreview(URL.createObjectURL(file));
+                }
+              }}
+            />
+
+            {imagePreview && (
+              <div className="image-preview-container">
+                <img src={imagePreview} alt="리뷰 이미지 미리보기" className="image-preview" />
+              </div>
+            )}
           </div>
 
           <textarea
