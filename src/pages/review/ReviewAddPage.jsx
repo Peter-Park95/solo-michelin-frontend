@@ -53,7 +53,8 @@ function ReviewAddPage() {
         comment,
       };
 
-      formData.append('request', new Blob([JSON.stringify(reviewData)], { type: 'application/json' }));
+      formData.append('request', new Blob([JSON.stringify(reviewData)], { type: 'application/json' }), 'request.json');
+
       if (imageFile) {
         formData.append('image', imageFile);
       }

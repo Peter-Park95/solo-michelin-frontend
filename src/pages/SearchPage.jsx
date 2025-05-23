@@ -1,40 +1,89 @@
 // src/pages/SearchPage.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./SearchPage.css";
+import { useNavigate } from "react-router-dom";
 
 const SearchPage = () => {
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (search.length < 2) {
+        setResults([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`/api/kakao-search?query=${search}`);
+        const sliced = res.data.documents.slice(0, 3);
+        setResults(sliced);
+      } catch (error) {
+        console.error("검색 실패:", error);
+      }
+    };
+
+    const delay = setTimeout(() => fetchData(), 300);
+    return () => clearTimeout(delay);
+  }, [search]);
+
   return (
     <div className="search-page">
-      {/* ✅ 상단 제목 */}
       <h2 className="search-title">맛집 검색하기</h2>
 
-      {/* 검색 입력창 */}
       <div className="search-input-box">
-        <input type="text" placeholder="음식점을 검색해보세요" />
+        <input
+          type="text"
+          placeholder="음식점을 검색해보세요"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setSelectedPlace(null);
+          }}
+        />
       </div>
 
-{/*        */}{/* 필터 버튼들 */}
-{/*       <div className="filter-buttons"> */}
-{/*         {["필터", "내 주변", "지역", "음식 종류", "혜택", "가격"].map((name, i) => ( */}
-{/*           <button key={i} className="filter-btn"> */}
-{/*             {name} */}
-{/*           </button> */}
-{/*         ))} */}
-{/*       </div> */}
+      <ul className="search-result-list">
+        {results.map((place, i) => (
+          <li
+            key={i}
+            className="search-result-item"
+            onClick={() => setSelectedPlace(place)}
+          >
+            <strong>{place.place_name}</strong>
+            <br />
+            {place.road_address_name}
+          </li>
+        ))}
+      </ul>
 
-{/*        */}{/* 추천 카드 리스트 */}
-{/*       <div className="recommend-section"> */}
-{/*         <h3>이런 곳 어때요?</h3> */}
-{/*         <div className="card-list"> */}
-{/*            */}{/* 추후 map으로 대체 */}
-{/*           <div className="recommend-card"> */}
-{/*             <img src="/icons/steak.jpg" alt="추천" /> */}
-{/*             <div className="title">분위기 좋은 스테이크</div> */}
-{/*           </div> */}
-{/*         </div> */}
-{/*       </div> */}
+      {selectedPlace && (
+        <div className="selected-place-card">
+          <div className="place-info">
+            <h3>{selectedPlace.place_name}</h3>
+            <p>{selectedPlace.road_address_name}</p>
+            <p>{selectedPlace.category_name}</p>
+          </div>
+          <button
+            className="review-btn"
+            onClick={() =>
+              navigate("/add-review", {
+                state: {
+                  name: selectedPlace.place_name,
+                  address: selectedPlace.road_address_name,
+                  category: selectedPlace.category_name,
+                },
+              })
+            }
+          >
+            리뷰 작성하기
+          </button>
+        </div>
+      )}
 
-      {/* 하단 고정 검색 버튼 */}
       <button className="search-bottom-btn">검색</button>
     </div>
   );

@@ -7,7 +7,7 @@ function ListPage() {
   const [reviews, setReviews] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [filter, setFilter] = useState("latest"); // ⭐️ 필터 상태 추가
+  const [filter, setFilter] = useState("latest");
   const navigate = useNavigate();
   const userId = 5;
   const pageSize = 5;
@@ -24,7 +24,7 @@ function ListPage() {
       });
       if (node) observer.current.observe(node);
     },
-                    [hasMore]
+    [hasMore]
   );
 
   const fetchReviews = async () => {
@@ -40,15 +40,15 @@ function ListPage() {
       });
 
       if (page === 0) {
-          setReviews(res.data.reviews); // 필터 바꾸거나 새로 시작하면 덮어쓰기
-        } else {
-          setReviews((prev) => {
-            const newReviews = res.data.reviews.filter(
-              (r) => !prev.some((p) => p.id === r.id)
-            );
-            return [...prev, ...newReviews];
-          });
-        }
+        setReviews(res.data.reviews);
+      } else {
+        setReviews((prev) => {
+          const newReviews = res.data.reviews.filter(
+            (r) => !prev.some((p) => p.id === r.id)
+          );
+          return [...prev, ...newReviews];
+        });
+      }
       setHasMore(res.data.hasMore);
     } catch (err) {
       console.error("리뷰 불러오기 실패:", err);
@@ -56,7 +56,6 @@ function ListPage() {
   };
 
   useEffect(() => {
-    // 필터가 바뀌면 새로 로딩
     setPage(0);
     setReviews([]);
     setHasMore(true);
@@ -88,56 +87,36 @@ function ListPage() {
       </div>
 
       <div className="filter-buttons">
-        <button
-          className={filter === "latest" ? "active" : ""}
-          onClick={() => handleFilterClick("latest")}
-        >
-          🕘 최신순
-        </button>
-        <button
-          className={filter === "rating" ? "active" : ""}
-          onClick={() => handleFilterClick("rating")}
-        >
-          📈 랭킹순
-        </button>
-        <button
-          className={filter === "min4" ? "active" : ""}
-          onClick={() => handleFilterClick("min4")}
-        >
-          🌟 4.0 이상
-        </button>
-        <button
-          className={filter === "korean" ? "active" : ""}
-          onClick={() => handleFilterClick("korean")}
-        >
-          🍚 한식
-        </button>
-        <button
-          className={filter === "japanese" ? "active" : ""}
-          onClick={() => handleFilterClick("japanese")}
-        >
-          🍣 일식
-        </button>
+        <button className={filter === "latest" ? "active" : ""} onClick={() => handleFilterClick("latest")}>🕘 최신순</button>
+        <button className={filter === "rating" ? "active" : ""} onClick={() => handleFilterClick("rating")}>📈 랭킹순</button>
+        <button className={filter === "min4" ? "active" : ""} onClick={() => handleFilterClick("min4")}>🌟 4.0 이상</button>
+        <button className={filter === "korean" ? "active" : ""} onClick={() => handleFilterClick("korean")}>🍚 한식</button>
+        <button className={filter === "japanese" ? "active" : ""} onClick={() => handleFilterClick("japanese")}>🍣 일식</button>
       </div>
 
       <div className="restaurant-list">
-        {reviews.map((review, index) => (
-          <div
-            className="restaurant-card"
-            key={review.id}
-            ref={index === reviews.length - 1 ? lastItemRef : null}
-          >
-            <img
-              src={review.restaurantImageUrl}
-              alt={review.restaurantName}
-            />
-            <div className="restaurant-info">
-              <h4>{review.restaurantName}</h4>
-              <p>{review.comment}</p>
-              <p className="rating">내 평점: ⭐ {review.rating}</p>
+        {reviews.map((review, index) => {
+          const imageUrl = review.imageUrl || review.restaurantImageUrl;
+          return (
+            <div
+              className="restaurant-card"
+              key={review.id}
+              ref={index === reviews.length - 1 ? lastItemRef : null}
+            >
+              {imageUrl && (
+<img
+  src={review.reviewImageUrl || review.restaurantImageUrl}
+  alt={review.restaurantName}
+/>
+              )}
+              <div className="restaurant-info">
+                <h4>{review.restaurantName}</h4>
+                <p>{review.comment}</p>
+                <p className="rating">내 평점: ⭐ {review.rating}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
