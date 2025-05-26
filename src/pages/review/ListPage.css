@@ -106,3 +106,46 @@
   font-weight: bold;
   color: #f39c12;
 }
+.restaurant-card {
+  position: relative; /* ✅ 버튼을 절대 위치로 띄우기 위해 필요 */
+  display: flex;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  min-height: 70px;
+}
+
+.floating-actions {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+
+.mini-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0,0,0,0.1);
+  transition: 0.1s ease;
+}
+
+.mini-btn.edit {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.mini-btn.delete {
+  background-color: #ffecec;
+  color: #ff4d4d;
+}
+
+.mini-btn:hover {
+  transform: scale(1.05);
+}

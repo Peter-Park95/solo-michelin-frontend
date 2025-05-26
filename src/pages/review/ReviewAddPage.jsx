@@ -3,6 +3,7 @@ import axios from 'axios';
 import StarRating from '../../components/StarRating';
 import './ReviewAddPage.css';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 function ReviewAddPage() {
   const [search, setSearch] = useState('');
@@ -13,9 +14,27 @@ function ReviewAddPage() {
   const [moodRating, setMoodRating] = useState(0);
   const [serviceRating, setServiceRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [imageFile, setImageFile] = useState(null); // 이미지 파일
-  const [imagePreview, setImagePreview] = useState(null); // 미리보기 URL
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserId(decoded.userId);
+      } catch (err) {
+        console.error("토큰 디코딩 실패:", err);
+        alert("로그인이 만료되었어요. 다시 로그인해주세요.");
+        navigate("/login");
+      }
+    } else {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -47,7 +66,7 @@ function ReviewAddPage() {
     try {
       const formData = new FormData();
       const reviewData = {
-        userId: 5, // 추후 로그인 연동 예정
+        userId,
         restaurantId: selectedRestaurant.id,
         rating: finalRating,
         comment,
@@ -145,7 +164,6 @@ function ReviewAddPage() {
             </div>
           </div>
 
-          {/* 📸 이미지 업로드 버튼 */}
           <div className="image-upload-section">
             <button
               type="button"

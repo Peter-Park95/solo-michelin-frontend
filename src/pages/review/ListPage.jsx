@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import "./ListPage.css";
 
 function ListPage() {
@@ -8,8 +9,8 @@ function ListPage() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [filter, setFilter] = useState("latest");
+  const [userId, setUserId] = useState(null); // userId 상태로 바꿈
   const navigate = useNavigate();
-  const userId = 5;
   const pageSize = 5;
 
   const observer = useRef();
@@ -28,6 +29,7 @@ function ListPage() {
   );
 
   const fetchReviews = async () => {
+    if (!userId) return; // userId 없으면 실행 안함
     try {
       const res = await axios.get(`/api/reviews/user/${userId}`, {
         params: {
@@ -55,29 +57,52 @@ function ListPage() {
     }
   };
 
+  // ⬇️ 토큰에서 userId 추출
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.userId);
+    } catch (err) {
+      console.error("토큰 디코딩 실패:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
     setPage(0);
     setReviews([]);
     setHasMore(true);
-  }, [filter]);
+  }, [filter, userId]);
 
   useEffect(() => {
     fetchReviews();
-  }, [page, filter]);
+  }, [page, filter, userId]);
 
   const handleFilterClick = (type) => {
     if (type === filter) return;
     setFilter(type);
   };
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("정말 삭제할까요?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/api/reviews/${id}`);
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      console.error("리뷰 삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="list-page">
       <div className="list-page-header">
         <h2 className="list-title">내 맛집 리스트</h2>
-        <button
-          className="add-button-top"
-          onClick={() => navigate("/add-review")}
-        >
+        <button className="add-button-top" onClick={() => navigate("/add-review")}>
           + 추가하기
         </button>
       </div>
@@ -103,12 +128,18 @@ function ListPage() {
               key={review.id}
               ref={index === reviews.length - 1 ? lastItemRef : null}
             >
+              <div className="floating-actions">
+                <button className="mini-btn edit" onClick={() => navigate(`/edit-review/${review.id}`)}>✏️</button>
+                <button className="mini-btn delete" onClick={() => handleDelete(review.id)}>🗑️</button>
+              </div>
+
               {imageUrl && (
-<img
-  src={review.reviewImageUrl || review.restaurantImageUrl}
-  alt={review.restaurantName}
-/>
+                <img
+                  src={review.reviewImageUrl || review.restaurantImageUrl}
+                  alt={review.restaurantName}
+                />
               )}
+
               <div className="restaurant-info">
                 <h4>{review.restaurantName}</h4>
                 <p>{review.comment}</p>

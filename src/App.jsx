@@ -8,6 +8,9 @@ import MyPage from "./pages/user/MyPage";
 import BottomTab from "./components/BottomTab";
 import ReviewAddPage from "./pages/review/ReviewAddPage";
 import EditProfilePage from "./pages/user/EditProfilePage";
+import KakaoCallbackPage from "./pages/user/KakaoCallbackPage";
+import KakaoRedirectHandler from "./pages/user/KakaoRedirectHandler";
+import SignUpPage from "./pages/user/SignUpPage";
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
             <Route path="/add-review" element={<ReviewAddPage />} />
              <Route path="/mypage" element={<MyPage />} />
              <Route path="/edit-profile" element={<EditProfilePage />} />
+             <Route path="/api/auth/kakao/callback" element={<KakaoCallbackPage />} />
+             <Route path="/kakao-redirect" element={<KakaoRedirectHandler />} />
+             <Route path="/signup" element={<SignUpPage />} />
           </Routes>
           <BottomTab />
         </div>

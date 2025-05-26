@@ -57,7 +57,7 @@
   border-radius: 12px;
   padding: 12px;
   background-color: #fdfdfd;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .restaurant-card img {
@@ -82,6 +82,7 @@
   font-weight: bold;
   color: #f39c12;
 }
+
 .edit-profile {
   margin-left: auto;
   padding: 6px 12px;
@@ -105,6 +106,125 @@
 
 .region {
   font-size: 13px;
-  color: #888; /* ✅ follow 글자와 통일 */
+  color: #888;
   margin-left: 4px;
+}
+
+/* 로그인 화면 전용 */
+.login-prompt {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.login-logo {
+  width: 180px;
+  margin-bottom: 24px;
+}
+
+.login-box input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.login-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 12px;
+}
+
+.disabled-btn {
+  flex: 1;
+  padding: 10px 0;
+  margin: 0 4px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #666;
+  cursor: default;
+}
+
+/* ✅ 로그인 버튼 스타일 */
+.login-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px 0;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  background-color: #ff4d4d;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #e04343;
+}
+.kakao-login-section {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.kakao-label {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.kakao-login-btn {
+  background-color: #FEE500;
+  color: #000;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.1s ease;
+}
+
+.kakao-login-btn:hover {
+  transform: scale(1.03);
+}
+
+.kakao-icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+.logout-btn {
+  margin-left: 12px;
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+.signup-btn {
+  flex: 1;
+  padding: 10px 0;
+  margin: 0 4px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #666;
+  cursor: default;
 }

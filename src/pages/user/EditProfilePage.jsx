@@ -1,44 +1,71 @@
-import React, { useEffect, useState } from "react"; // ✅ useEffect 추가
+import React, { useEffect, useState } from "react";
 import "./EditProfilePage.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const EditProfilePage = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState("");       // ✅ 초기값 비움
+  const [userId, setUserId] = useState(null);
+
+  const [nickname, setNickname] = useState(""); // 표시용
+  const [email, setEmail] = useState(""); // PUT 요청에 필요
   const [introduction, setIntroduction] = useState("");
   const [region, setRegion] = useState("");
 
-  // ✅ 사용자 정보 불러오기
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.userId);
+    } catch (err) {
+      console.error("토큰 디코딩 실패:", err);
+      navigate("/login");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
     const fetchUserInfo = async () => {
       try {
-        const res = await axios.get("/api/users/5");
-        setNickname(res.data.username);                     // ✅ nickname → username
-        setIntroduction(res.data.introduction || "");
-        setRegion(res.data.region || "");
+        const res = await axios.get(`/api/users/${userId}`);
+        const data = res.data;
+        setNickname(data.username || "");
+        setEmail(data.email || "");
+        setIntroduction(data.introduction || "");
+        setRegion(data.region || "");
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
       }
     };
 
     fetchUserInfo();
-  }, []);
+  }, [userId]);
 
   const handleSave = async () => {
+    if (!userId) return;
+
     try {
-      await axios.put("/api/users/5", {
-          username: nickname,
-          password: "1234",               // 임시 값
-          email: "test01@google.com",      // 임시 값
-          profileImage: "",
-          introduction,
-          region
+      await axios.put(`/api/users/${userId}`, {
+        username: nickname, // readonly지만 포함 필요
+        email,
+        profileImage: "", // 추후 이미지 업로드 구현 시 변경
+        introduction,
+        region,
       });
+
       alert("프로필이 저장되었습니다.");
       navigate("/mypage");
     } catch (err) {
       console.error("저장 실패:", err);
+      alert("저장 중 오류가 발생했습니다.");
     }
   };
 
@@ -56,7 +83,8 @@ const EditProfilePage = () => {
         <input
           type="text"
           value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          disabled
+          style={{ backgroundColor: "#f2f2f2", cursor: "not-allowed" }}
         />
       </div>
 
