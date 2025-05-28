@@ -3,6 +3,7 @@ import "./MyPage.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Header from "../../components/Header";
 
 const MyPage = () => {
   const [reviews, setReviews] = useState([]);
@@ -72,87 +73,92 @@ const MyPage = () => {
     }
   };
 
-  return (
-    <div className="mypage">
-      {!isLoggedIn ? (
-        <div className="login-prompt">
-          <img src="/public/login_logo.png" alt="나혼자미슐랭" className="login-logo" />
-          <div className="login-box">
-            <input type="text" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <div className="login-buttons">
-              <button className="signup-btn"  onClick={handleSignUpClick}>회원가입</button>
-              <button className="disabled-btn">비밀번호 찾기</button>
-            </div>
-            <button className="login-btn" onClick={handleLogin}>로그인</button>
-          </div>
-<div className="kakao-login-section">
+ return (
+    <>
+      <Header title="마이페이지" showMenu={true} /> {/* ✅ 공통 헤더 삽입 */}
 
-<button
-  className="kakao-login-btn"
-  onClick={() => {
-    window.location.href = "http://localhost:8080/api/auth/kakao";
-  }}
->
-    <img src="/public/icons/kakao_icon.png" alt="kakao" className="kakao-icon" />
-    <span>카카오로 시작하기</span>
-  </button>
-</div>
-        </div>
-      ) : (
-        <>
-<h2 className="mypage-title">
-  마이페이지
-  <button className="logout-btn" onClick={() => {
-    localStorage.removeItem("token");
-    navigate("/login"); // 또는 navigate("/") 등 원하는 경로
-  }}>
-    로그아웃
-  </button>
-</h2>
-          <div className="profile-box">
-<div className="profile-img">
-  <img
-    src={
-      userInfo.profileImage && userInfo.profileImage.trim() !== ""
-        ? userInfo.profileImage
-        : "/default_profile.png"
-    }
-    alt="프로필 이미지"
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src = "/default_profile.png";
-    }}
-    className="profile-avatar"
-  />
-</div>
-            <div className="profile-info">
-              <div className="name-region-box">
-                <span className="name">{userInfo.username}</span>
-                {userInfo.region && <span className="region"> | {userInfo.region}</span>}
+      <div className="mypage">
+        {!isLoggedIn ? (
+          <div className="login-prompt">
+            <img src="/public/login_logo.png" alt="나혼자미슐랭" className="login-logo" />
+            <div className="login-box">
+              <input type="text" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <div className="login-buttons">
+                <button className="signup-btn" onClick={handleSignUpClick}>회원가입</button>
+                <button className="disabled-btn">비밀번호 찾기</button>
               </div>
-              <div className="follow">내 맛집 {reviewCount}</div>
+              <button className="login-btn" onClick={handleLogin}>로그인</button>
             </div>
-            <button className="edit-profile" onClick={() => navigate("/edit-profile")}>프로필 수정</button>
+            <div className="kakao-login-section">
+              <button
+                className="kakao-login-btn"
+                onClick={() => {
+                  window.location.href = "http://localhost:8080/api/auth/kakao";
+                }}
+              >
+                <img src="/public/icons/kakao_icon.png" alt="kakao" className="kakao-icon" />
+                <span>카카오로 시작하기</span>
+              </button>
+            </div>
           </div>
+        ) : (
+          <>
+            <h2 className="mypage-title">
+              마이페이지
+              <button className="logout-btn" onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/mypage");
+              }}>
+                로그아웃
+              </button>
+            </h2>
 
-          <div className="section-title">최근 내가 간 곳</div>
-          <div className="restaurant-list">
-            {reviews.map((review) => (
-              <div className="restaurant-card" key={review.id}>
-                <img src={review.restaurantImageUrl} alt={review.restaurantName} />
-                <div className="restaurant-info">
-                  <h4>{review.restaurantName}</h4>
-                  <p>{review.comment}</p>
-                  <p className="rating">⭐ {review.rating}</p>
+            <div className="profile-box">
+              <div className="profile-img">
+                <img
+                  src={
+                    userInfo.profileImage && userInfo.profileImage.trim() !== ""
+                      ? userInfo.profileImage
+                      : "/default_profile.png"
+                  }
+                  alt="프로필 이미지"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/default_profile.png";
+                  }}
+                  className="profile-avatar"
+                />
+              </div>
+              <div className="profile-info">
+                <div className="name-region-box">
+                  <span className="name">{userInfo.username}</span>
+                  {userInfo.region && <span className="region"> | {userInfo.region}</span>}
                 </div>
+                <div className="follow">내 맛집 {reviewCount}</div>
               </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+              <button className="edit-profile" onClick={() => navigate("/edit-profile")}>프로필 수정</button>
+            </div>
+
+            <div className="section-title">최근 내가 간 곳</div>
+            <div className="restaurant-list">
+              {reviews.map((review) => (
+                <div className="restaurant-card" key={review.id}>
+                  <img src={review.restaurantImageUrl} alt={review.restaurantName} />
+                  <div className="restaurant-info">
+                    <h4>{review.restaurantName}</h4>
+                    <p>{review.comment}</p>
+                    <p className="rating">⭐ {review.rating}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 };
+
 
 export default MyPage;

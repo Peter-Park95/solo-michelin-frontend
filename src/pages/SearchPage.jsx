@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./SearchPage.css";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 const SearchPage = () => {
   const [search, setSearch] = useState("");
@@ -32,6 +33,7 @@ const SearchPage = () => {
 
   return (
     <div className="search-page">
+      <Header title="나혼자 미슐랭" showMenu={true} />
       <h2 className="search-title">맛집 검색하기</h2>
 
       <div className="search-input-box">
@@ -84,7 +86,11 @@ const SearchPage = () => {
         </div>
       )}
 
-      <button className="search-bottom-btn">검색</button>
+      {/* 👇 여기에 개발 중인 MAP 영역 추가 */}
+      <div className="map-coming-soon">
+        <div className="map-spinner"></div>
+        <p className="map-text">🔧 MAP 기능 개발 중이에요!</p>
+      </div>
     </div>
   );
 };

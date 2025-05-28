@@ -8,10 +8,12 @@ const EditProfilePage = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
 
-  const [nickname, setNickname] = useState(""); // 표시용
-  const [email, setEmail] = useState(""); // PUT 요청에 필요
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
   const [introduction, setIntroduction] = useState("");
   const [region, setRegion] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [profileImageFile, setProfileImageFile] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -41,6 +43,7 @@ const EditProfilePage = () => {
         setEmail(data.email || "");
         setIntroduction(data.introduction || "");
         setRegion(data.region || "");
+        setProfileImageUrl(data.profileImage || "");
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
       }
@@ -49,16 +52,31 @@ const EditProfilePage = () => {
     fetchUserInfo();
   }, [userId]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImageFile(file);
+      setProfileImageUrl(URL.createObjectURL(file));
+    }
+  };
+
   const handleSave = async () => {
     if (!userId) return;
 
+    const formData = new FormData();
+    formData.append("username", nickname);
+    formData.append("email", email);
+    formData.append("introduction", introduction);
+    formData.append("region", region);
+    if (profileImageFile) {
+      formData.append("image", profileImageFile);
+    }
+
     try {
-      await axios.put(`/api/users/${userId}`, {
-        username: nickname, // readonly지만 포함 필요
-        email,
-        profileImage: "", // 추후 이미지 업로드 구현 시 변경
-        introduction,
-        region,
+      await axios.put(`/api/users/${userId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       alert("프로필이 저장되었습니다.");
@@ -74,8 +92,26 @@ const EditProfilePage = () => {
       <h2 className="title">← 프로필 수정</h2>
 
       <div className="profile-img-upload">
-        <div className="profile-img">🙎‍♂️</div>
-        <button className="edit-icon">✏</button>
+        <div className="profile-img">
+          <img
+            src={profileImageUrl || "/default_profile.png"}
+            alt="프로필"
+            className="profile-avatar"
+          />
+        </div>
+        <button
+          className="edit-icon"
+          onClick={() => document.getElementById("profileImgInput").click()}
+        >
+          ✏
+        </button>
+        <input
+          type="file"
+          accept="image/*"
+          id="profileImgInput"
+          style={{ display: "none" }}
+          onChange={handleImageChange}
+        />
       </div>
 
       <div className="form-group">

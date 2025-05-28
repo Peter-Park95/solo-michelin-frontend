@@ -1,5 +1,5 @@
 .list-page {
-  padding: 16px;
+  padding: 0 16px;
   padding-bottom: 100px;
   font-family: sans-serif;
   background-color: #fafafa;
@@ -135,7 +135,7 @@
   box-shadow: 0 0 2px rgba(0,0,0,0.1);
   transition: 0.1s ease;
 }
-
+list
 .mini-btn.edit {
   background-color: #f0f0f0;
   color: #333;

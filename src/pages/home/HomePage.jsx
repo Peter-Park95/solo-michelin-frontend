@@ -1,15 +1,12 @@
 import React from "react";
 import "./HomePage.css";
+import Header from "../../components/Header";
 
 const HomePage = () => {
   console.log("🔥 HomePage 렌더링됨");
   return (
     <div className="home-container">
-      {/* 로고 + 메뉴 */}
-      <header className="home-header">
-        <div className="logo">🍽️ <strong>나홀로 미슐랭</strong></div>
-        <div className="menu">☰</div>
-      </header>
+      <Header title="나혼자 미슐랭" showMenu={true} />
 
       {/* 검색창 */}
       <div className="search-box">
@@ -25,7 +22,8 @@ const HomePage = () => {
         <img src="/icons/steak.jpg" alt="steak" />
       </div>
 
-      {/* 카테고리 3x2 */}
+      {/* 카테고리 3x2 - 현재 개발 중 */}
+      {/*
       <div className="category-grid">
         {["한식", "양식", "중식", "일식", "뷔페", "카페"].map((name, i) => (
           <div className="category-item" key={i}>
@@ -33,6 +31,12 @@ const HomePage = () => {
             <span>{name}</span>
           </div>
         ))}
+      </div>
+      */}
+
+      <div className="dev-placeholder">
+        <div className="spinner"></div>
+        <p> Home 기능 개발 중이에요! </p>
       </div>
     </div>
   );

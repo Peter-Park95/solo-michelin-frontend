@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "./ListPage.css";
-
+import Header from "../../components/Header"
 function ListPage() {
   const [reviews, setReviews] = useState([]);
   const [page, setPage] = useState(0);
@@ -98,7 +98,11 @@ function ListPage() {
     }
   };
 
-  return (
+return (
+  <>
+    {/* 헤더는 바깥에! */}
+    <Header title="나혼자 미슐랭" showMenu={true} />
+
     <div className="list-page">
       <div className="list-page-header">
         <h2 className="list-title">내 맛집 리스트</h2>
@@ -150,7 +154,8 @@ function ListPage() {
         })}
       </div>
     </div>
-  );
+  </>
+);
 }
 
 export default ListPage;

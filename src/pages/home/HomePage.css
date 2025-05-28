@@ -64,3 +64,39 @@
   height: 48px;
   margin-bottom: 8px;
 }
+.dev-placeholder {
+  margin: 40px 16px 0;
+  padding: 24px;
+  text-align: center;
+  background-color: #fff8f5;
+  border: 1px dashed #ff4e4e;
+  border-radius: 16px;
+  color: #ff4e4e;
+}
+
+.dev-placeholder p {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  animation: fadeText 1.5s ease-in-out infinite alternate;
+}
+
+.spinner {
+  margin: 0 auto;
+  width: 32px;
+  height: 32px;
+  border: 4px solid #ffe1e1;
+  border-top: 4px solid #ff4e4e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeText {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
