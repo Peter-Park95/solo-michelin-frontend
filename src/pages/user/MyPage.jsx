@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 const MyPage = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewCount, setReviewCount] = useState(0);
-  const [userInfo, setUserInfo] = useState({ username: "", introduction: "", region: "" });
+  const [userInfo, setUserInfo] = useState({ username: "", introduction: "", region: "", profile_image_url: "" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userId, setUserId] = useState(null);
@@ -19,7 +19,6 @@ const MyPage = () => {
     const token = localStorage.getItem("token");
     try {
       const decoded = jwtDecode(token);
-        console.log("decoded:", decoded);
       setUserId(decoded.userId); // 백엔드 JWT에 따라 key 조정 필요
     } catch (err) {
       console.error("토큰 디코딩 실패:", err);
@@ -33,6 +32,7 @@ const MyPage = () => {
       try {
         const res = await axios.get(`/api/users/${userId}`);
         setUserInfo(res.data);
+
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
       }
@@ -111,7 +111,21 @@ const MyPage = () => {
   </button>
 </h2>
           <div className="profile-box">
-            <div className="profile-img">🙎‍♂️</div>
+<div className="profile-img">
+  <img
+    src={
+      userInfo.profileImage && userInfo.profileImage.trim() !== ""
+        ? userInfo.profileImage
+        : "/default_profile.png"
+    }
+    alt="프로필 이미지"
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src = "/default_profile.png";
+    }}
+    className="profile-avatar"
+  />
+</div>
             <div className="profile-info">
               <div className="name-region-box">
                 <span className="name">{userInfo.username}</span>
