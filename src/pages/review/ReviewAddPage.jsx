@@ -6,6 +6,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 function ReviewAddPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [foodRating, setFoodRating] = useState(0);
   const [moodRating, setMoodRating] = useState(0);
@@ -14,9 +16,11 @@ function ReviewAddPage() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [userId, setUserId] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  // JWT에서 userId 추출
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -33,6 +37,7 @@ function ReviewAddPage() {
     }
   }, []);
 
+  // SearchPage에서 넘겨받은 장소가 있다면 바로 세팅
   useEffect(() => {
     const prefilled = location.state;
     if (prefilled) {
@@ -40,49 +45,75 @@ function ReviewAddPage() {
     }
   }, [location.state]);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // 검색어 변경 시 자동 검색
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      if (searchQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
 
-  const ratings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
-  if (!selectedRestaurant || ratings.length === 0) {
-    alert("음식점과 최소 1개 이상의 별점을 입력해주세요!");
-    return;
-  }
+      try {
+        const res = await axios.get(`/api/kakao-search?query=${searchQuery}`);
+        const converted = res.data.documents.slice(0, 3).map((doc) => ({
+          kakaoPlaceId: doc.id,
+          name: doc.place_name,
+          address: doc.road_address_name,
+          category: doc.category_name,
+          mapUrl: doc.place_url,
+        }));
+        setSearchResults(converted);
+      } catch (err) {
+        console.error("장소 검색 실패:", err);
+      }
+    };
 
-  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  const finalRating = Math.ceil(avg * 10) / 10;
+    const timer = setTimeout(fetchPlaces, 300); // 디바운싱
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const reviewData = {
-    restaurantName: selectedRestaurant.name,
-    address: selectedRestaurant.address,
-    category: selectedRestaurant.category,
-    kakaoPlaceId: selectedRestaurant.kakaoPlaceId,
-    mapUrl: selectedRestaurant.mapUrl,
-    rating: finalRating,
-    comment,
+  const handleSubmit = async () => {
+    if (!selectedRestaurant || !userId) return;
+
+    const ratings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
+    if (ratings.length === 0) {
+      alert("평점을 하나 이상 입력해주세요.");
+      return;
+    }
+
+    const avgRating = Math.ceil((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10;
+
+    const formData = new FormData();
+    const reviewData = {
+      restaurantName: selectedRestaurant.name,
+      address: selectedRestaurant.address,
+      category: selectedRestaurant.category,
+      kakaoPlaceId: selectedRestaurant.kakaoPlaceId,
+      mapUrl: selectedRestaurant.mapUrl,
+      rating: avgRating,
+      comment,
+    };
+
+    formData.append("review", new Blob([JSON.stringify(reviewData)], { type: "application/json" }));
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    try {
+      await axios.post("/api/reviews/kakao", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      alert("리뷰가 저장되었습니다!");
+      navigate("/list");
+    } catch (err) {
+      console.error("리뷰 저장 실패:", err.response?.data || err.message);
+      alert("리뷰 저장 중 오류가 발생했습니다.");
+    }
   };
-
-  const formData = new FormData();
-  formData.append("review", new Blob([JSON.stringify(reviewData)], { type: "application/json" }));
-  if (imageFile) {
-    formData.append("image", imageFile);
-  }
-
-  try {
-    await axios.post("/api/reviews/kakao", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    alert("리뷰가 저장되었습니다!");
-    navigate("/list");
-  } catch (err) {
-    console.error("리뷰 저장 실패:", err.response?.data || err.message);
-    alert("리뷰 저장 중 오류가 발생했습니다.");
-  }
-};
 
   const displayRatings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
   const displayAvg =
@@ -93,6 +124,31 @@ const handleSubmit = async (e) => {
   return (
     <div className="review-page">
       <h2>리뷰 작성하기</h2>
+
+      {!selectedRestaurant && (
+        <>
+          <div className="search-box">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="음식점을 검색하세요"
+            />
+          </div>
+          <ul className="search-results">
+            {searchResults.map((place) => (
+              <li
+                key={place.kakaoPlaceId}
+                className="search-result-item"
+                onClick={() => setSelectedRestaurant(place)}
+              >
+                <strong>{place.name}</strong>
+                <div style={{ fontSize: "0.9em", color: "#666" }}>{place.address}</div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {selectedRestaurant && (
         <>

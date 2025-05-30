@@ -144,7 +144,7 @@ const MyPage = () => {
             <div className="restaurant-list">
               {reviews.map((review) => (
                 <div className="restaurant-card" key={review.id}>
-                  <img src={review.restaurantImageUrl} alt={review.restaurantName} />
+                  <img src={review.reviewImageUrl} alt={review.restaurantName} />
                   <div className="restaurant-info">
                     <h4>{review.restaurantName}</h4>
                     <p>{review.comment}</p>
