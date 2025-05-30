@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import StarRating from '../../components/StarRating';
-import './ReviewAddPage.css';
-import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import StarRating from "../../components/StarRating";
+import "./ReviewAddPage.css";
+import { useNavigate, useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function ReviewAddPage() {
-  const [search, setSearch] = useState('');
-  const [restaurantList, setRestaurantList] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-
   const [foodRating, setFoodRating] = useState(0);
   const [moodRating, setMoodRating] = useState(0);
   const [serviceRating, setServiceRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -26,8 +24,7 @@ function ReviewAddPage() {
         const decoded = jwtDecode(token);
         setUserId(decoded.userId);
       } catch (err) {
-        console.error("토큰 디코딩 실패:", err);
-        alert("로그인이 만료되었어요. 다시 로그인해주세요.");
+        alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
         navigate("/login");
       }
     } else {
@@ -37,58 +34,55 @@ function ReviewAddPage() {
   }, []);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      if (search.length < 2) return;
-      try {
-        const res = await axios.get(`/api/restaurants?query=${search}`);
-        setRestaurantList(Array.isArray(res.data) ? res.data : []);
-      } catch (error) {
-        console.error('음식점 검색 실패:', error);
-        setRestaurantList([]);
-      }
-    };
-
-    fetchRestaurants();
-  }, [search]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const ratings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
-    if (!selectedRestaurant || ratings.length === 0) {
-      alert('음식점과 최소 1개 이상의 별점을 입력해주세요!');
-      return;
+    const prefilled = location.state;
+    if (prefilled) {
+      setSelectedRestaurant(prefilled);
     }
+  }, [location.state]);
 
-    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-    const finalRating = Math.ceil(avg * 10) / 10;
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const formData = new FormData();
-      const reviewData = {
-        userId,
-        restaurantId: selectedRestaurant.id,
-        rating: finalRating,
-        comment,
-      };
+  const ratings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
+  if (!selectedRestaurant || ratings.length === 0) {
+    alert("음식점과 최소 1개 이상의 별점을 입력해주세요!");
+    return;
+  }
 
-      formData.append('request', new Blob([JSON.stringify(reviewData)], { type: 'application/json' }), 'request.json');
+  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  const finalRating = Math.ceil(avg * 10) / 10;
 
-      if (imageFile) {
-        formData.append('image', imageFile);
-      }
-
-      await axios.post('/api/reviews', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      alert('리뷰가 저장되었습니다!');
-      navigate('/list');
-    } catch (error) {
-      console.error('리뷰 저장 실패:', error);
-      alert('리뷰 저장 중 오류가 발생했습니다.');
-    }
+  const reviewData = {
+    restaurantName: selectedRestaurant.name,
+    address: selectedRestaurant.address,
+    category: selectedRestaurant.category,
+    kakaoPlaceId: selectedRestaurant.kakaoPlaceId,
+    mapUrl: selectedRestaurant.mapUrl,
+    rating: finalRating,
+    comment,
   };
+
+  const formData = new FormData();
+  formData.append("review", new Blob([JSON.stringify(reviewData)], { type: "application/json" }));
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+
+  try {
+    await axios.post("/api/reviews/kakao", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    alert("리뷰가 저장되었습니다!");
+    navigate("/list");
+  } catch (err) {
+    console.error("리뷰 저장 실패:", err.response?.data || err.message);
+    alert("리뷰 저장 중 오류가 발생했습니다.");
+  }
+};
 
   const displayRatings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
   const displayAvg =
@@ -100,35 +94,6 @@ function ReviewAddPage() {
     <div className="review-page">
       <h2>리뷰 작성하기</h2>
 
-      <input
-        type="text"
-        placeholder="음식점 이름 검색"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setSelectedRestaurant(null);
-        }}
-      />
-
-      {search.length >= 2 && !selectedRestaurant && (
-        <ul className="restaurant-search-list">
-          {restaurantList.map((r) => (
-            <li
-              key={r.id}
-              onClick={() => {
-                setSelectedRestaurant(r);
-                setSearch(r.name);
-                setRestaurantList([]);
-              }}
-              className="restaurant-search-item"
-            >
-              <div className="restaurant-name">{r.name}</div>
-              <div className="restaurant-address">{r.address}</div>
-            </li>
-          ))}
-        </ul>
-      )}
-
       {selectedRestaurant && (
         <>
           <div className="selected-restaurant-card">
@@ -136,13 +101,6 @@ function ReviewAddPage() {
               <div className="restaurant-name">{selectedRestaurant.name}</div>
               <div className="restaurant-address">{selectedRestaurant.address}</div>
             </div>
-            {selectedRestaurant.imageUrl && (
-              <img
-                src={selectedRestaurant.imageUrl}
-                alt={`${selectedRestaurant.name} 썸네일`}
-                className="restaurant-thumbnail"
-              />
-            )}
           </div>
 
           <div className="average-rating-display">
@@ -168,16 +126,15 @@ function ReviewAddPage() {
             <button
               type="button"
               className="image-upload-button"
-              onClick={() => document.getElementById('review-image-input').click()}
+              onClick={() => document.getElementById("review-image-input").click()}
             >
               📷 사진 추가하기
             </button>
-
             <input
               type="file"
               accept="image/*"
               id="review-image-input"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -186,7 +143,6 @@ function ReviewAddPage() {
                 }
               }}
             />
-
             {imagePreview && (
               <div className="image-preview-container">
                 <img src={imagePreview} alt="리뷰 이미지 미리보기" className="image-preview" />

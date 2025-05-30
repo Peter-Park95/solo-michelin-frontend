@@ -1,4 +1,3 @@
-// src/pages/SearchPage.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./SearchPage.css";
@@ -77,6 +76,8 @@ const SearchPage = () => {
                   name: selectedPlace.place_name,
                   address: selectedPlace.road_address_name,
                   category: selectedPlace.category_name,
+                  kakaoPlaceId: selectedPlace.id,
+                  mapUrl: selectedPlace.place_url,
                 },
               })
             }
@@ -86,7 +87,6 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* 👇 여기에 개발 중인 MAP 영역 추가 */}
       <div className="map-coming-soon">
         <div className="map-spinner"></div>
         <p className="map-text">🔧 MAP 기능 개발 중이에요!</p>

@@ -124,34 +124,34 @@ return (
       </div>
 
       <div className="restaurant-list">
-        {reviews.map((review, index) => {
-          const imageUrl = review.imageUrl || review.restaurantImageUrl;
-          return (
-            <div
-              className="restaurant-card"
-              key={review.id}
-              ref={index === reviews.length - 1 ? lastItemRef : null}
-            >
-              <div className="floating-actions">
-                <button className="mini-btn edit" onClick={() => navigate(`/edit-review/${review.id}`)}>✏️</button>
-                <button className="mini-btn delete" onClick={() => handleDelete(review.id)}>🗑️</button>
-              </div>
+{reviews.map((review, index) => {
+  const imageUrl = review.reviewImageUrl || review.restaurantImageUrl;
+  return (
+    <div
+      className="restaurant-card"
+      key={review.id}
+      ref={index === reviews.length - 1 ? lastItemRef : null}
+    >
+      <div className="floating-actions">
+        <button className="mini-btn edit" onClick={() => navigate(`/edit-review/${review.id}`)}>✏️</button>
+        <button className="mini-btn delete" onClick={() => handleDelete(review.id)}>🗑️</button>
+      </div>
 
-              {imageUrl && (
-                <img
-                  src={review.reviewImageUrl || review.restaurantImageUrl}
-                  alt={review.restaurantName}
-                />
-              )}
+      {imageUrl && (
+        <img
+          src={encodeURI(imageUrl)}
+          alt={review.restaurantName}
+        />
+      )}
 
-              <div className="restaurant-info">
-                <h4>{review.restaurantName}</h4>
-                <p>{review.comment}</p>
-                <p className="rating">내 평점: ⭐ {review.rating}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div className="restaurant-info">
+        <h4>{review.restaurantName}</h4>
+        <p>{review.comment}</p>
+        <p className="rating">내 평점: ⭐ {review.rating}</p>
+      </div>
+    </div>
+  );
+})}
       </div>
     </div>
   </>
