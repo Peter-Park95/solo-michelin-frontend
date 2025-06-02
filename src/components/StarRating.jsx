@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as fullStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import './StarRating.css';
 
-const StarRating = ({ rating, setRating }) => {
+const StarRating = ({ rating = 0, setRating }) => {
   const [hover, setHover] = useState(0);
   const [isClicked, setIsClicked] = useState(false);
+
+  // ⭐ rating이 0보다 크면 isClicked = true
+  useEffect(() => {
+    if (rating > 0) setIsClicked(true);
+  }, [rating]);
 
   const getStarIcon = (index) => {
     const score = isClicked ? rating : hover;
@@ -39,6 +44,8 @@ const StarRating = ({ rating, setRating }) => {
     if (!isClicked) setHover(0);
   };
 
+  const displayValue = (isClicked ? rating : hover) || 0;
+
   return (
     <div className="star-rating-container">
       {[0, 1, 2, 3, 4].map((index) => (
@@ -56,7 +63,7 @@ const StarRating = ({ rating, setRating }) => {
           />
         </div>
       ))}
-      <span className="rating-value">{(isClicked ? rating : hover).toFixed(1)}</span>
+      <span className="rating-value">{displayValue.toFixed(1)}</span>
     </div>
   );
 };

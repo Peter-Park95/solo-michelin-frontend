@@ -26,6 +26,9 @@ function ReviewAddPage() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+          console.log("📦 디코딩된 토큰:", decoded);
+          console.log("🔚 만료 시간:", decoded.exp);
+          console.log("⏰ 현재 시간:", Math.floor(Date.now() / 1000));
         setUserId(decoded.userId);
       } catch (err) {
         alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
@@ -90,10 +93,12 @@ function ReviewAddPage() {
       category: selectedRestaurant.category,
       kakaoPlaceId: selectedRestaurant.kakaoPlaceId,
       mapUrl: selectedRestaurant.mapUrl,
-      rating: avgRating,
-      comment,
+      foodRating: foodRating,
+      moodRating: moodRating,
+      serviceRating: serviceRating,
+      comment: comment,
     };
-
+    console.log("📦 전송할 reviewData:", reviewData);
     formData.append("review", new Blob([JSON.stringify(reviewData)], { type: "application/json" }));
     if (imageFile) {
       formData.append("image", imageFile);

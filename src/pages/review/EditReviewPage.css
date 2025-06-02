@@ -1,0 +1,56 @@
+/* 보조 스타일 – 필요 시 분리 */
+.review-page {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.selected-restaurant-card {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background-color: #fafafa;
+}
+
+.restaurant-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.restaurant-address {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.image-upload-button {
+  padding: 0.5rem 1rem;
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.image-upload-button:hover {
+  background-color: #005fcc;
+}
+
+.image-preview-container {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}

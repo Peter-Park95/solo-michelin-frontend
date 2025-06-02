@@ -7,6 +7,7 @@ import ListPage from "./pages/review/ListPage";
 import MyPage from "./pages/user/MyPage";
 import BottomTab from "./components/BottomTab";
 import ReviewAddPage from "./pages/review/ReviewAddPage";
+import EditReviewPage from "./pages/review/EditReviewPage";
 import EditProfilePage from "./pages/user/EditProfilePage";
 import KakaoCallbackPage from "./pages/user/KakaoCallbackPage";
 import KakaoRedirectHandler from "./pages/user/KakaoRedirectHandler";
@@ -22,6 +23,7 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/list" element={<ListPage />} />
             <Route path="/add-review" element={<ReviewAddPage />} />
+            <Route path="/edit-review/:id" element={<EditReviewPage />} />
              <Route path="/mypage" element={<MyPage />} />
              <Route path="/edit-profile" element={<EditProfilePage />} />
              <Route path="/api/auth/kakao/callback" element={<KakaoCallbackPage />} />
