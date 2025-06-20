@@ -105,7 +105,7 @@ function ReviewAddPage() {
     }
 
     try {
-      await axios.post("/api/reviews/kakao", formData, {
+      await axios.post("/api/reviews/kakao/create", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -218,7 +218,7 @@ function ReviewAddPage() {
             rows={4}
           />
 
-          <button className="submit-button" onClick={handleSubmit}>
+          <button form method="POST" className="submit-button" onClick={handleSubmit}>
             저장하기
           </button>
         </>

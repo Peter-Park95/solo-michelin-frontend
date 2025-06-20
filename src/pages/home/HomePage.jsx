@@ -1,9 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./HomePage.css";
 import Header from "../../components/Header";
+import axios from "axios";
 
 const HomePage = () => {
-  console.log("🔥 HomePage 렌더링됨");
+  const [allReviews, setAllReviews] = useState([]);
+  const [currentIndexes, setCurrentIndexes] = useState([0, 1, 2]);
+
+  // 리뷰 불러오기
+  useEffect(() => {
+    axios
+      .get("/api/reviews/highlights?limit=9")
+      .then((res) => setAllReviews(res.data))
+      .catch((err) => console.error("리뷰 불러오기 실패", err));
+  }, []);
+
+  // 인덱스 슬라이드 순환
+  useEffect(() => {
+    if (allReviews.length <= 3) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndexes((prev) => {
+        const next = prev.map((i) => (i + 1) % allReviews.length);
+        return next;
+      });
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [allReviews]);
+
   return (
     <div className="home-container">
       <Header title="나혼자 미슐랭" showMenu={true} />
@@ -22,7 +47,7 @@ const HomePage = () => {
         <img src="/icons/steak.jpg" alt="steak" />
       </div>
 
-      {/* 카테고리 3x2 - 현재 개발 중 */}
+      {/* 카테고리 (비활성화 상태) */}
       {/*
       <div className="category-grid">
         {["한식", "양식", "중식", "일식", "뷔페", "카페"].map((name, i) => (
@@ -34,10 +59,25 @@ const HomePage = () => {
       </div>
       */}
 
-      <div className="dev-placeholder">
-        <div className="spinner"></div>
-        <p> Home 기능 개발 중이에요! </p>
-      </div>
+      {/* 리뷰 하이라이트 */}
+      {allReviews.length >= 3 && (
+        <div className="highlight-list-wrapper">
+            <div className="highlight-title">🔥 Hot Reviews</div>
+          {currentIndexes.map((idx) => {
+            const review = allReviews[idx];
+            return (
+              <div className="highlight-card fade-in" key={idx}>
+                <img src={review.imageUrl} alt="리뷰" />
+                <div className="highlight-info">
+                  <strong>{review.restaurantName}</strong>
+                  <span>⭐ {review.rating}</span>
+                  <p>{review.comment}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
