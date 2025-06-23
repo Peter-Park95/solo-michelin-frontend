@@ -5,9 +5,8 @@ import axios from "axios";
 
 const HomePage = () => {
   const [allReviews, setAllReviews] = useState([]);
-  const [currentIndexes, setCurrentIndexes] = useState([0, 1, 2]);
+  const [currentSetIndex, setCurrentSetIndex] = useState(0);
 
-  // 리뷰 불러오기
   useEffect(() => {
     axios
       .get("/api/reviews/highlights?limit=9")
@@ -15,19 +14,20 @@ const HomePage = () => {
       .catch((err) => console.error("리뷰 불러오기 실패", err));
   }, []);
 
-  // 인덱스 슬라이드 순환
   useEffect(() => {
-    if (allReviews.length <= 3) return;
+    if (allReviews.length < 9) return;
 
     const interval = setInterval(() => {
-      setCurrentIndexes((prev) => {
-        const next = prev.map((i) => (i + 1) % allReviews.length);
-        return next;
-      });
+      setCurrentSetIndex((prev) => (prev + 1) % 3); // 0 → 1 → 2 → 0 반복
     }, 6000);
 
     return () => clearInterval(interval);
   }, [allReviews]);
+
+  const getCurrentReviewSet = () => {
+    const start = currentSetIndex * 3;
+    return allReviews.slice(start, start + 3);
+  };
 
   return (
     <div className="home-container">
@@ -47,35 +47,20 @@ const HomePage = () => {
         <img src="/icons/steak.jpg" alt="steak" />
       </div>
 
-      {/* 카테고리 (비활성화 상태) */}
-      {/*
-      <div className="category-grid">
-        {["한식", "양식", "중식", "일식", "뷔페", "카페"].map((name, i) => (
-          <div className="category-item" key={i}>
-            <img src={`/icons/icon${i + 1}.png`} alt={name} />
-            <span>{name}</span>
-          </div>
-        ))}
-      </div>
-      */}
-
       {/* 리뷰 하이라이트 */}
-      {allReviews.length >= 3 && (
+      {allReviews.length >= 9 && (
         <div className="highlight-list-wrapper">
-            <div className="highlight-title">🔥 Hot Reviews</div>
-          {currentIndexes.map((idx) => {
-            const review = allReviews[idx];
-            return (
-              <div className="highlight-card fade-in" key={idx}>
-                <img src={review.imageUrl} alt="리뷰" />
-                <div className="highlight-info">
-                  <strong>{review.restaurantName}</strong>
-                  <span>⭐ {review.rating}</span>
-                  <p>{review.comment}</p>
-                </div>
+          <div className="highlight-title">🔥 Hot Reviews</div>
+          {getCurrentReviewSet().map((review, idx) => (
+            <div className="highlight-card fade-in" key={idx}>
+              <img src={review.imageUrl} alt="리뷰" />
+              <div className="highlight-info">
+                <strong>{review.restaurantName}</strong>
+                <span>⭐ {review.rating}</span>
+                <p>{review.comment}</p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
