@@ -86,7 +86,8 @@ const MyPage = () => {
               <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
               <div className="login-buttons">
                 <button className="signup-btn" onClick={handleSignUpClick}>회원가입</button>
-                <button className="disabled-btn">비밀번호 찾기</button>
+                <button className="disabled-btn" onClick={() => navigate("/forgot-password")}>비밀번호 찾기</button>
+                <button className="findEmail-btn" onClick={() => navigate("/find-email")}>이메일 찾기</button>
               </div>
               <button className="login-btn" onClick={handleLogin}>로그인</button>
             </div>
