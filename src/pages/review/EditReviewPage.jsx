@@ -81,6 +81,20 @@ const EditReviewPage = () => {
     }
   };
 
+const handleImageDelete = async () => {
+  const confirmDelete = window.confirm("이미지를 삭제하시겠습니까?");
+  if (!confirmDelete) return;
+  try {
+    await axios.patch(`/api/reviews/${id}/image`);
+    setImagePreview(null);
+    setImageFile(null);
+    alert("이미지가 삭제되었습니다.");
+  } catch (err) {
+    console.error("이미지 삭제 실패:", err.response?.data || err.message);
+    alert("이미지 삭제 중 오류가 발생했습니다.");
+  }
+};
+
 const displayRatings = [foodRating, moodRating, serviceRating].filter((r) => r > 0);
 const displayAvg =
   displayRatings.length > 0
@@ -143,6 +157,13 @@ const displayAvg =
         {imagePreview && (
           <div className="image-preview-container">
             <img src={imagePreview} alt="리뷰 이미지" className="image-preview" />
+            <button
+              type="button"
+              className="delete-image-button"
+              onClick={handleImageDelete}
+            >
+              🗑️ 이미지 삭제
+            </button>
           </div>
         )}
       </div>

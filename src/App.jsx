@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"
 
+
 import HomePage from "./pages/home/HomePage";
 import SearchPage from "./pages/SearchPage";
 import ListPage from "./pages/review/ListPage";
@@ -14,6 +15,9 @@ import EditProfilePage from "./pages/user/EditProfilePage";
 import KakaoCallbackPage from "./pages/user/KakaoCallbackPage";
 import KakaoRedirectHandler from "./pages/user/KakaoRedirectHandler";
 import SignUpPage from "./pages/user/SignUpPage";
+import ForgotPasswordPage from "./pages/user/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/user/ResetPasswordPage";
+import FindEmailPage from "./pages/user/FindEmailPage";
 
 //JWT 만료 확인
 function isTokenExpired(token) {
@@ -69,6 +73,9 @@ function AppWrapper() {
           <Route path="/api/auth/kakao/callback" element={<KakaoCallbackPage />} />
           <Route path="/kakao-redirect" element={<KakaoRedirectHandler />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/find-email" element={<FindEmailPage />} />
         </Routes>
         <BottomTab />
       </div>
