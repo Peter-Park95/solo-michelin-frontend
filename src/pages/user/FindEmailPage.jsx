@@ -1,63 +1,32 @@
-// import { useState } from "react";
-// import axios from "axios";
-//
-// export default function FindEmailPage() {
-//   const [username, setUsername] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [error, setError] = useState("");
-//
-//   const handleFindEmail = async () => {
-//     try {
-//       const res = await axios.post("http://localhost:8080/api/auth/find-email", {
-//         username
-//       });
-//       setEmail(res.data.email);
-//       setError("");
-//     } catch (err) {
-//       setError("닉네임으로 이메일을 찾을 수 없습니다.");
-//       setEmail("");
-//     }
-//   };
-//
-//   return (
-//     <div className="form-box">
-//       <h2>이메일 찾기</h2>
-//       <input
-//         type="text"
-//         placeholder="닉네임 입력"
-//         value={username}
-//         onChange={(e) => setUsername(e.target.value)}
-//       />
-//       <button onClick={handleFindEmail}>이메일 찾기</button>
-//       {email && <p>이메일: {email}</p>}
-//       {error && <p style={{ color: "red" }}>{error}</p>}
-//     </div>
-//   );
-// }
-
 import React, { useState } from "react";
 import axios from "axios";
 import "./FindEmailPage.css";
+import {useNavigate} from "react-router-dom";
 
 const FindEmailPage = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleFindEmail = async () => {
-    if (!name || !phone) {
-      alert("이름과 전화번호를 모두 입력해주세요.");
+    if (!username || !phone) {
+      setError("이름과 전화번호를 모두 입력해주세요.");
+      setEmail("");
       return;
     }
 
     try {
-      const res = await axios.post("/api/users/find-email", {
-        name,
+      const res = await axios.post("http://localhost:8080/api/auth/find-email", {
+        username,
         phone,
       });
-      alert(`가입된 이메일: ${res.data.email}`);
+      setEmail(res.data.email);
+      setError("");
     } catch (err) {
-      console.error("이메일 찾기 실패:", err);
-      alert(err.response?.data?.message || "이메일 찾기 중 오류가 발생했습니다.");
+      setEmail("");
+      setError(err.response?.data?.message || "이메일 찾기 중 오류가 발생했습니다.");
     }
   };
 
@@ -66,14 +35,13 @@ const FindEmailPage = () => {
       <h2 className="title">이메일 찾기</h2>
 
       <div className="form-group">
-        <label htmlFor="name">이름</label>
+        <label htmlFor="username">이름</label>
         <input
-          id="name"
+          id="username"
           type="text"
           placeholder="이름 입력"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="name"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
       </div>
 
@@ -85,13 +53,24 @@ const FindEmailPage = () => {
           placeholder="전화번호 입력 (예: 010-1234-5678)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          autoComplete="tel"
         />
       </div>
 
       <button className="find-button" onClick={handleFindEmail}>
         이메일 찾기
       </button>
+
+      {/* ✅ 이메일 결과 박스 */}
+      {email && (
+        <div className="result-box success">
+          가입된 이메일: <strong>{email}</strong>
+        </div>
+      )}
+
+      {error && <div className="result-box error">{error}</div>}
+    <button className="forgot-email-button" onClick={() => navigate("/forgot-password")}>
+      비밀번호 찾으러가기
+    </button>
     </div>
   );
 };

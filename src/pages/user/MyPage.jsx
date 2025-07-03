@@ -81,16 +81,29 @@ const MyPage = () => {
         {!isLoggedIn ? (
           <div className="login-prompt">
             <img src="/public/login_logo.png" alt="나혼자미슐랭" className="login-logo" />
-            <div className="login-box">
-              <input type="text" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <div className="login-buttons">
-                <button className="signup-btn" onClick={handleSignUpClick}>회원가입</button>
-                <button className="disabled-btn" onClick={() => navigate("/forgot-password")}>비밀번호 찾기</button>
-                <button className="findEmail-btn" onClick={() => navigate("/find-email")}>이메일 찾기</button>
-              </div>
-              <button className="login-btn" onClick={handleLogin}>로그인</button>
-            </div>
+<div className="login-box">
+  <div className="login-input-group">
+    <input
+      type="text"
+      placeholder="이메일"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    />
+    <input
+      type="password"
+      placeholder="비밀번호"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </div>
+
+  <button className="login-btn" onClick={handleLogin}>로그인</button>
+
+  <div className="login-buttons">
+    <button className="signup-btn" onClick={handleSignUpClick}>회원가입</button>
+    <button className="disabled-btn" onClick={() => navigate("/forgot-password")}>비밀번호 찾기</button>
+  </div>
+</div>
             <div className="kakao-login-section">
               <button
                 className="kakao-login-btn"

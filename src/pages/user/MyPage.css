@@ -259,3 +259,18 @@
   object-fit: cover; /* 중심을 기준으로 꽉 채우기 */
   display: block;
 }
+.login-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.login-input-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
