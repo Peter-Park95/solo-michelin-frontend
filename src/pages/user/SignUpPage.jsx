@@ -7,12 +7,13 @@ const SignUpPage = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleSignUp = async () => {
-    if (!email || !nickname || !password || !passwordConfirm) {
+    if (!email || !name || !password || !passwordConfirm) {
       alert("모든 항목을 입력해주세요.");
       return;
     }
@@ -25,8 +26,9 @@ const SignUpPage = () => {
     try {
       await axios.post("/api/users", {
         email,
-        username: nickname,
+        username: name,
         password,
+        phoneNumber
       });
       alert("회원가입 성공! 로그인 페이지로 이동합니다.");
       navigate("/mypage");
@@ -39,7 +41,28 @@ const SignUpPage = () => {
   return (
     <div className="signup-page">
       <h2 className="title">회원가입</h2>
-
+      <div className="form-group">
+        <label htmlFor="name">이름</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="이름 입력"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="username"
+        />
+      </div>
+      <div className="form-group">
+        <label htmlFor="phoneNumber">전화번호</label>
+        <input
+          id="phoneNumber"
+          type="text"
+          placeholder="전화번호 입력 (ex 010-0000-0000)"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          autoComplete="phonenumber"
+        />
+      </div>
       <div className="form-group">
         <label htmlFor="email">이메일</label>
         <input
@@ -52,17 +75,6 @@ const SignUpPage = () => {
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="nickname">닉네임</label>
-        <input
-          id="nickname"
-          type="text"
-          placeholder="닉네임 입력"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          autoComplete="username"
-        />
-      </div>
 
       <div className="form-group">
         <label htmlFor="password">비밀번호</label>
