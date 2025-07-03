@@ -11,7 +11,7 @@ const Header = () => {
         <h1 className="header-title">나혼자 미슐랭</h1>
       </div>
 
-      <div className="menu-icon">☰</div>
+      <div className="menu-icon" className="menu-icon disabled"  >☰</div>
     </header>
   );
 };

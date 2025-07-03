@@ -217,7 +217,18 @@
   background-color: #d32f2f;
 }
 
-.signup-btn {
+.signup-btn{
+  flex: 1;
+  padding: 10px 0;
+  margin: 0 4px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #666;
+  cursor: default;
+}
+.findEmail-btn {
   flex: 1;
   padding: 10px 0;
   margin: 0 4px;
