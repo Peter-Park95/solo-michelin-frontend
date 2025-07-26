@@ -129,3 +129,30 @@
   border-bottom: 1px dashed #ffcccc;
   margin-bottom: 8px;
 }
+.highlight-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.username {
+  font-size: 12px;
+  color: #666;
+}
+
+.highlight-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.like-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #ff4e4e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

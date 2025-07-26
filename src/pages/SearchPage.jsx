@@ -16,18 +16,15 @@ const SearchPage = () => {
   const observer = useRef();
   const navigate = useNavigate();
 
-  const lastPlaceRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          setPage((prev) => prev + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    []
-  );
+  const lastPlaceRef = useCallback((node) => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage((prev) => prev + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, []);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -87,10 +84,18 @@ const SearchPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (search.length < 2) return;
+      if (search.length < 2 || !userPosition) return;
 
       try {
-        const res = await axios.get(`/api/kakao-search?query=${search}&page=${page}`);
+        const res = await axios.get("/api/kakao-search", {
+          params: {
+            query: search,
+            page: page,
+            x: userPosition.lng,
+            y: userPosition.lat,
+          },
+        });
+
         const newResults = res.data.documents;
 
         if (page === 1) {
@@ -107,50 +112,90 @@ const SearchPage = () => {
     };
 
     fetchData();
-  }, [search, page]);
-
-  useEffect(() => {
-    if (!map || results.length === 0) return;
-
-    markersRef.current.forEach((m) => m.setMap(null));
-    markersRef.current = [];
-
-    const bounds = new window.kakao.maps.LatLngBounds();
-
-    results.forEach((place) => {
-      const position = new window.kakao.maps.LatLng(place.y, place.x);
-      const marker = new window.kakao.maps.Marker({ map, position });
-      markersRef.current.push(marker);
-      bounds.extend(position);
-
-      const iwContent = `
-        <div style="padding:10px; font-size:14px;">
-          <strong>${place.place_name}</strong><br/>
-          ${place.road_address_name}<br/>
-          <a href="${place.place_url}" target="_blank" style="color:blue">카카오맵에서 보기</a>
-        </div>
-      `;
-      const infowindow = new window.kakao.maps.InfoWindow({ content: iwContent });
-
-      window.kakao.maps.event.addListener(marker, "click", () => {
-        infowindow.open(map, marker);
-        setSelectedPlace(place);
-      });
-    });
-
-    map.setBounds(bounds);
-  }, [map, results]);
+  }, [search, page, userPosition]);
 
   const handlePlaceClick = (place) => {
     setSelectedPlace(place);
 
-    // 지도 클로즈업
     if (map) {
-      const moveLatLon = new window.kakao.maps.LatLng(place.y, place.x);
-      map.setLevel(3); // 숫자가 작을수록 확대 (보통 3~1 사이 추천)
-      map.setCenter(moveLatLon);
+      // 기존 마커 제거
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+
+      // 새 마커 생성
+      const position = new window.kakao.maps.LatLng(place.y, place.x);
+      const marker = new window.kakao.maps.Marker({ map, position });
+      markersRef.current.push(marker);
+
+      // 인포윈도우 생성 (HTML로 커스텀)
+    const offsetLat = position.getLat() - 0.004; // 기존 0.002 → 0.004로 더 내림
+    const adjustedCenter = new window.kakao.maps.LatLng(offsetLat, position.getLng());
+    map.panTo(adjustedCenter);
+    document.querySelector('.map-container')?.scrollIntoView({ behavior: "smooth" });
+const iwContent = `
+  <div style="
+    background-color:#f9f9f9;
+    padding:10px 12px;
+    border-radius:10px;
+    max-width:200px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family:'Pretendard', sans-serif;
+    font-size:12px;
+    color:#333;
+    line-height:1.4;
+  ">
+    <div style="font-weight:600; font-size:13px; margin-bottom:4px;">${place.place_name}</div>
+    <div style="margin-bottom:4px;">${place.road_address_name}</div>
+    <a href="${place.place_url}" target="_blank" style="font-size:11px; color:#007bff; text-decoration:underline;">카카오맵에서 보기</a>
+    <button style="
+      display:block;
+      margin-top:8px;
+      background-color:#ff4e4e;
+      color:white;
+      border:none;
+      border-radius:5px;
+      padding:5px 8px;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+    "
+    onclick='window.dispatchEvent(new CustomEvent("navigateToReview", { detail: ${JSON.stringify(place)} }))'>
+      리뷰 작성하기
+    </button>
+  </div>
+`;
+
+      const infowindow = new window.kakao.maps.InfoWindow({
+        content: iwContent,
+      });
+
+      infowindow.open(map, marker);
+      map.setLevel(3);
+      map.setCenter(position);
     }
   };
+
+  // "리뷰 작성하기" 버튼 클릭 시 페이지 이동 처리
+  useEffect(() => {
+    const handleNavigateToReview = (e) => {
+      const place = e.detail;
+      navigate("/add-review", {
+        state: {
+          name: place.place_name,
+          address: place.road_address_name,
+          category: place.category_name,
+          kakaoPlaceId: place.id,
+          mapUrl: place.place_url,
+        },
+      });
+    };
+
+    window.addEventListener("navigateToReview", handleNavigateToReview);
+    return () => {
+      window.removeEventListener("navigateToReview", handleNavigateToReview);
+    };
+  }, [navigate]);
 
   return (
     <div className="search-page">
@@ -181,38 +226,12 @@ const SearchPage = () => {
               <strong>{place.place_name}</strong>
               <br />
               {place.road_address_name}
-              {selectedPlace?.id === place.id && (
-                <div className="selected-place-card">
-                  <div className="place-info">
-                    <h3>{selectedPlace.place_name}</h3>
-                    <p>{selectedPlace.road_address_name}</p>
-                    <p>{selectedPlace.category_name}</p>
-                  </div>
-                  <button
-                    className="review-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate("/add-review", {
-                        state: {
-                          name: selectedPlace.place_name,
-                          address: selectedPlace.road_address_name,
-                          category: selectedPlace.category_name,
-                          kakaoPlaceId: selectedPlace.id,
-                          mapUrl: selectedPlace.place_url,
-                        },
-                      });
-                    }}
-                  >
-                    리뷰 작성하기
-                  </button>
-                </div>
-              )}
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="map-container" ref={mapRef} style={{ height: "50vh" }}></div>
+      <div className="map-container" ref={mapRef} style={{ height: "70vh" }}></div>
     </div>
   );
 };

@@ -29,6 +29,26 @@ const HomePage = () => {
     return allReviews.slice(start, start + 3);
   };
 
+  const handleLikeToggle = async (reviewId) => {
+    try {
+      const updatedReviews = allReviews.map((r) => {
+        if (r.id !== reviewId) return r;
+
+        const liked = !r.likedByMe;
+        const newCount = liked ? r.likeCount + 1 : r.likeCount - 1;
+
+        // 서버 요청 (토글 API 호출)
+        axios.post(`/api/reviews/${reviewId}/like-toggle`);
+
+        return { ...r, likedByMe: liked, likeCount: newCount };
+      });
+
+      setAllReviews(updatedReviews);
+    } catch (err) {
+      console.error("좋아요 토글 실패", err);
+    }
+  };
+
   return (
     <div className="home-container">
       <Header title="나혼자 미슐랭" showMenu={true} />
@@ -54,10 +74,22 @@ const HomePage = () => {
           {getCurrentReviewSet().map((review, idx) => (
             <div className="highlight-card fade-in" key={idx}>
               <img src={review.imageUrl} alt="리뷰" />
+
               <div className="highlight-info">
-                <strong>{review.restaurantName}</strong>
+                <div className="highlight-top">
+                  <strong>{review.restaurantName}</strong>
+                  <span className="username">{review.userName}</span>
+                </div>
                 <span>⭐ {review.rating}</span>
                 <p>{review.comment}</p>
+                <div className="highlight-bottom">
+                  <button
+                    className="like-button"
+                    onClick={() => handleLikeToggle(review.id)}
+                  >
+                    {review.likedByMe ? "❤️" : "🤍"} {review.likeCount ?? 0}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
