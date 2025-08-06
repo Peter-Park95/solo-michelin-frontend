@@ -16,6 +16,7 @@ const SearchPage = () => {
   const observer = useRef();
   const navigate = useNavigate();
 
+  // 무한스크롤용 IntersectionObserver 콜백
   const lastPlaceRef = useCallback((node) => {
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver((entries) => {
@@ -26,6 +27,7 @@ const SearchPage = () => {
     if (node) observer.current.observe(node);
   }, []);
 
+  // 사용자 현재 위치 가져오기
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -40,6 +42,7 @@ const SearchPage = () => {
     }
   }, []);
 
+  // 카카오 지도 API 로딩 및 지도 생성
   useEffect(() => {
     const loadMap = () => {
       if (window.kakao && window.kakao.maps && userPosition && mapRef.current) {
@@ -77,11 +80,13 @@ const SearchPage = () => {
     }
   }, [userPosition]);
 
+  // 검색어 변경 시 초기화
   useEffect(() => {
     setPage(1);
     setResults([]);
   }, [search]);
 
+  // 장소 검색 및 결과 누적
   useEffect(() => {
     const fetchData = async () => {
       if (search.length < 2 || !userPosition) return;
@@ -114,69 +119,7 @@ const SearchPage = () => {
     fetchData();
   }, [search, page, userPosition]);
 
-  const handlePlaceClick = (place) => {
-    setSelectedPlace(place);
-
-    if (map) {
-      // 기존 마커 제거
-      markersRef.current.forEach((m) => m.setMap(null));
-      markersRef.current = [];
-
-      // 새 마커 생성
-      const position = new window.kakao.maps.LatLng(place.y, place.x);
-      const marker = new window.kakao.maps.Marker({ map, position });
-      markersRef.current.push(marker);
-
-      // 인포윈도우 생성 (HTML로 커스텀)
-    const offsetLat = position.getLat() - 0.004; // 기존 0.002 → 0.004로 더 내림
-    const adjustedCenter = new window.kakao.maps.LatLng(offsetLat, position.getLng());
-    map.panTo(adjustedCenter);
-    document.querySelector('.map-container')?.scrollIntoView({ behavior: "smooth" });
-const iwContent = `
-  <div style="
-    background-color:#f9f9f9;
-    padding:10px 12px;
-    border-radius:10px;
-    max-width:200px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    font-family:'Pretendard', sans-serif;
-    font-size:12px;
-    color:#333;
-    line-height:1.4;
-  ">
-    <div style="font-weight:600; font-size:13px; margin-bottom:4px;">${place.place_name}</div>
-    <div style="margin-bottom:4px;">${place.road_address_name}</div>
-    <a href="${place.place_url}" target="_blank" style="font-size:11px; color:#007bff; text-decoration:underline;">카카오맵에서 보기</a>
-    <button style="
-      display:block;
-      margin-top:8px;
-      background-color:#ff4e4e;
-      color:white;
-      border:none;
-      border-radius:5px;
-      padding:5px 8px;
-      font-size:11px;
-      font-weight:600;
-      cursor:pointer;
-      width:100%;
-    "
-    onclick='window.dispatchEvent(new CustomEvent("navigateToReview", { detail: ${JSON.stringify(place)} }))'>
-      리뷰 작성하기
-    </button>
-  </div>
-`;
-
-      const infowindow = new window.kakao.maps.InfoWindow({
-        content: iwContent,
-      });
-
-      infowindow.open(map, marker);
-      map.setLevel(3);
-      map.setCenter(position);
-    }
-  };
-
-  // "리뷰 작성하기" 버튼 클릭 시 페이지 이동 처리
+  // 리뷰 작성 페이지로 이동하는 전역 이벤트 등록
   useEffect(() => {
     const handleNavigateToReview = (e) => {
       const place = e.detail;
@@ -196,6 +139,133 @@ const iwContent = `
       window.removeEventListener("navigateToReview", handleNavigateToReview);
     };
   }, [navigate]);
+
+  // 장소 클릭 시 위시리스트 상태를 서버에서 받아서 selectedPlace에 저장
+  const handlePlaceClick = async (place) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`/api/wishlist/check`, {
+        params: { kakaoPlaceId: place.id },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const isWishlisted = res.data.isWishlisted;
+      setSelectedPlace({ ...place, isWishlisted });
+    } catch (err) {
+      console.error("위시리스트 상태 확인 실패:", err);
+      setSelectedPlace({ ...place, isWishlisted: false }); // 기본값
+    }
+  };
+
+  // InfoWindow 생성 및 마커 표시 (selectedPlace가 바뀔 때마다)
+  useEffect(() => {
+    if (!selectedPlace || !map) return;
+
+    const { x, y, place_name, road_address_name, place_url, isWishlisted } = selectedPlace;
+
+    const position = new window.kakao.maps.LatLng(y, x);
+    const marker = new window.kakao.maps.Marker({ map, position });
+
+    // 이전 마커 제거
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = [marker];
+
+    const offsetLat = position.getLat() - 0.004;
+    const adjustedCenter = new window.kakao.maps.LatLng(offsetLat, position.getLng());
+    map.panTo(adjustedCenter);
+
+    const heart = isWishlisted ? "❤️" : "🤍";
+
+    const iwContent = `
+      <div style="
+        position: relative;
+        background-color:#f9f9f9;
+        padding:10px 12px;
+        border-radius:10px;
+        max-width:200px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-family:'Pretendard', sans-serif;
+        font-size:12px;
+        color:#333;
+        line-height:1.4;
+      ">
+        <button id="heart-btn" data-kakao-place-id="${selectedPlace.id}" style="
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+          color: #ff4e4e;
+        ">${heart}</button>
+
+        <div style="font-weight:600; font-size:13px; margin-bottom:4px;">${place_name}</div>
+        <div style="margin-bottom:4px;">${road_address_name}</div>
+        <a href="${place_url}" target="_blank" style="font-size:11px; color:#007bff; text-decoration:underline;">카카오맵에서 보기</a>
+        <button style="
+          display:block;
+          margin-top:8px;
+          background-color:#ff4e4e;
+          color:white;
+          border:none;
+          border-radius:5px;
+          padding:5px 8px;
+          font-size:11px;
+          font-weight:600;
+          cursor:pointer;
+          width:100%;
+        "
+        onclick='window.dispatchEvent(new CustomEvent("navigateToReview", { detail: ${JSON.stringify(selectedPlace)} }))'>
+          리뷰 작성하기
+        </button>
+      </div>
+    `;
+
+    const infowindow = new window.kakao.maps.InfoWindow({ content: iwContent });
+    infowindow.open(map, marker);
+    map.setLevel(3);
+    map.setCenter(position);
+  }, [selectedPlace, map]);
+
+  // 하트 버튼 클릭 이벤트 위임 (문서 전체에서 위임처리)
+  useEffect(() => {
+    const handleHeartClick = async (e) => {
+      const target = e.target;
+      if (target && target.id === "heart-btn") {
+        const kakaoPlaceId = target.dataset.kakaoPlaceId;
+        if (!kakaoPlaceId) return;
+
+        try {
+          const token = localStorage.getItem("token");
+
+          // 현재 위시리스트 여부 확인
+          const res = await axios.get("/api/wishlist/check", {
+            params: { kakaoPlaceId },
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const isWishlisted = res.data.isWishlisted;
+
+          // 토글 요청
+          await axios.post(`/api/wishlist/${kakaoPlaceId}`, null, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // 하트 UI 반전
+          target.textContent = isWishlisted ? "🤍" : "❤️";
+        } catch (err) {
+          console.error("위시리스트 토글 실패:", err);
+          alert("로그인 후 다시 시도해주세요.");
+        }
+      }
+    };
+
+    document.addEventListener("click", handleHeartClick);
+    return () => document.removeEventListener("click", handleHeartClick);
+  }, []);
 
   return (
     <div className="search-page">
