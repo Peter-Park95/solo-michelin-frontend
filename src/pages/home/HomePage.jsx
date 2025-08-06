@@ -30,17 +30,29 @@ const HomePage = () => {
   };
 
   const handleLikeToggle = async (reviewId) => {
+    const token = localStorage.getItem("token"); // JWT 토큰 가져오기
+
+    if (!token) {
+      console.error("JWT 토큰이 없습니다.");
+      return;
+    }
+
     try {
       const updatedReviews = allReviews.map((r) => {
         if (r.id !== reviewId) return r;
 
         const liked = !r.likedByMe;
-        const newCount = liked ? r.likeCount + 1 : r.likeCount - 1;
-
-        // 서버 요청 (토글 API 호출)
-        axios.post(`/api/reviews/${reviewId}/like-toggle`);
+        const currentCount = Number(r.likeCount) || 0;
+        const newCount = liked ? currentCount + 1 : currentCount - 1;
 
         return { ...r, likedByMe: liked, likeCount: newCount };
+      });
+
+      // 서버 요청 (토큰을 포함한 헤더로 요청)
+      await axios.post(`/api/review_like/${reviewId}`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setAllReviews(updatedReviews);
