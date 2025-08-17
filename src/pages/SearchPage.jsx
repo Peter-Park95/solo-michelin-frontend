@@ -3,7 +3,7 @@ import axios from "axios";
 import "./SearchPage.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { jwtDecode } from "jwt-decode";          // ★ 추가
+import { jwtDecode } from "jwt-decode";
 
 const DEBOUNCE_MS = 250;
 
@@ -12,14 +12,13 @@ const SearchPage = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [userPosition, setUserPosition] = useState(null);
+  const [userPosition, setUserPosition] = useState(null); // 지도 센터용은 유지
   const [map, setMap] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [nationwide, setNationwide] = useState(false);
   const [placeStats, setPlaceStats] = useState(null);
   const [reviewPopup, setReviewPopup] = useState(null);
   const [reviewList, setReviewList] = useState([]);
-  const [userId, setUserId] = useState(null);    // ★ 추가
+  const [userId, setUserId] = useState(null);
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
@@ -28,7 +27,7 @@ const SearchPage = () => {
   const abortRef = useRef(null);
   const navigate = useNavigate();
 
-  // ★ JWT에서 userId 추출
+  // JWT에서 userId 추출
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -38,7 +37,6 @@ const SearchPage = () => {
         console.warn("토큰 만료");
         return;
       }
-      // 토큰 클레임 키는 백엔드 발급 형태에 맞추세요. (예: decoded.userId 또는 decoded.sub 등)
       setUserId(decoded.userId ?? decoded.sub ?? null);
     } catch (e) {
       console.error("JWT decode 실패:", e);
@@ -57,7 +55,7 @@ const SearchPage = () => {
     [hasNextPage]
   );
 
-  // 위치
+  // 위치(지도 센터용)
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -74,10 +72,7 @@ const SearchPage = () => {
       const center = userPosition
         ? new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng)
         : new window.kakao.maps.LatLng(37.5665, 126.978);
-      const mapInstance = new window.kakao.maps.Map(mapRef.current, {
-        center,
-        level: 4,
-      });
+      const mapInstance = new window.kakao.maps.Map(mapRef.current, { center, level: 4 });
       setMap(mapInstance);
     };
 
@@ -99,13 +94,11 @@ const SearchPage = () => {
   // 검색 디바운스 → 페이지 초기화
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => {
-      setPage(1);
-    }, DEBOUNCE_MS);
+    searchTimer.current = setTimeout(() => setPage(1), DEBOUNCE_MS);
     return () => clearTimeout(searchTimer.current);
-  }, [search, nationwide]);
+  }, [search]);
 
-  // 검색 API (★ userId 필수 전달)
+  // 검색 API (항상 전국 검색: x,y,nationwide 제거)
   useEffect(() => {
     const fetchData = async () => {
       const q = search.trim();
@@ -115,7 +108,6 @@ const SearchPage = () => {
         return;
       }
 
-      // userId가 없으면 호출하지 않음 (백엔드가 필수 요구)
       if (!userId) {
         console.warn("userId 없음: 검색 호출 스킵");
         setResults([]);
@@ -128,12 +120,7 @@ const SearchPage = () => {
       abortRef.current = controller;
 
       try {
-        const params = { query: q, page, nationwide, userId };  // ★ userId 포함
-        if (!nationwide && userPosition) {
-          params.x = userPosition.lng;
-          params.y = userPosition.lat;
-        }
-
+        const params = { query: q, page, userId }; // nationwide/x/y 제거
         const res = await axios.get("/api/kakao-search", {
           params,
           signal: controller.signal,
@@ -145,17 +132,25 @@ const SearchPage = () => {
         let meta = {};
 
         if (Array.isArray(data)) {
-          // BE가 List<PlaceDto>로 주는 경우
+          // 서버가 List<PlaceDto>로 반환하는 경우
           docs = data;
-          // 다음 페이지 유무는 서버에서 못 주니, 카카오 기준 페이지당 15개일 때의 휴리스틱(필요시 조정)
-          meta = { is_end: docs.length < 15 };
+          meta = { is_end: docs.length < 15 }; // 휴리스틱
         } else {
-          // 카카오 원본 프록시 형태 (documents/meta)
+          // 카카오 프록시 형태
           docs = data?.documents ?? [];
           meta = data?.meta ?? {};
         }
 
-        setResults((prev) => (page === 1 ? docs : [...prev, ...docs]));
+        setResults((prev) => {
+          const newList = page === 1 ? docs : [...prev, ...docs];
+          // 위시리스트 true 먼저, 나머지는 그대로
+          return newList.sort((a, b) => {
+            if (a.isWishlisted && !b.isWishlisted) return -1;
+            if (!a.isWishlisted && b.isWishlisted) return 1;
+            return 0; // 동일하면 원래 순서 유지
+          });
+        });
+
         setHasNextPage(meta.is_end === false);
       } catch (err) {
         if (err.name === "CanceledError") return;
@@ -165,7 +160,7 @@ const SearchPage = () => {
 
     fetchData();
     return () => abortRef.current?.abort();
-  }, [page, search, userPosition, nationwide, userId]); // ★ userId 의존성 추가
+  }, [page, search, userId]); // nationwide, userPosition 의존성 제거
 
   // 선택된 가게 통계
   useEffect(() => {
@@ -236,7 +231,6 @@ const SearchPage = () => {
     const prevResults = results;
     const prevSelected = selectedPlace;
 
-    // 낙관적 업데이트
     setResults((prev) =>
       prev.map((p) => (p.id === placeId ? { ...p, isWishlisted: !p.isWishlisted } : p))
     );
@@ -250,7 +244,6 @@ const SearchPage = () => {
       });
     } catch (err) {
       console.error("위시리스트 토글 실패:", err);
-      // 롤백
       setResults(prevResults);
       setSelectedPlace(prevSelected);
       alert("위시리스트 변경에 실패했습니다.");
@@ -330,9 +323,9 @@ const SearchPage = () => {
                   onClick={() => {
                     setSelectedPlace(place);
                     setPlaceStats(null);
-                    // ▼ 드롭다운 닫기
-                    setResults([]);
+                    setResults([]);      // 드롭다운 닫기
                     setHasNextPage(false);
+                    setSearch("");       // 검색어 초기화
                   }}
                 >
                   <div className="item-line1">
