@@ -1,184 +1,147 @@
+/* 페이지 프레임 */
 .search-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh; /* 모바일 주소창 이슈 대응 */
   max-width: 600px;
   margin: 0 auto;
   font-family: "Pretendard", sans-serif;
 }
 
-.search-header {
-  flex-shrink: 0;
-}
-
-.search-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 20px;
-  box-sizing: border-box;
-  background-color: #fff;
-}
-
-.map-container {
-  width: 100%;
-  height: 100vh;
-  flex-shrink: 0;
-  border-radius: 0;
-}
-
-.search-title {
-padding-left: 20px;
-padding-right: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.search-input-box {
-padding-left: 20px;
-padding-right: 20px;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.search-input-box input {
-padding-left: 20px;
-padding-right: 20px;
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  font-size: 16px;
-}
-
-.search-result-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 20px;
-  border-top: 1px solid #eee;
-}
-
-.search-result-item {
-  padding: 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  transition: background 0.2s;
-}
-
-.search-result-item:hover {
-  background-color: #f8f8f8;
-}
-
-.selected-place-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ddd;
-  background-color: #fff;
-  margin-top: 20px;
-}
-
-.selected-place-card .place-info h3 {
-  font-size: 18px;
-  margin: 0 0 6px;
-}
-
-.selected-place-card .place-info p {
-  margin: 0 0 8px;
-  color: #555;
-}
-
-.review-btn {
-  background-color: #ff4e4e;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s;
-}
-
-.review-btn:hover {
-  background-color: #e14242;
-}
-.home-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px;
-  font-size: 20px;
-}
-.search-bottom-btn {
-padding-left: 20px;
-padding-right: 20px;
-  width: 100%;
-  padding: 12px;
-  background-color: #ff4e4e;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  margin-top: 30px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.search-bottom-btn:hover {
-
-  background-color: #e14242;
-}
-
-.map-coming-soon {
-  margin-top: 40px;
-  padding: 20px;
-  text-align: center;
-  background-color: #fff8f5;
-  border: 1px dashed #ff4e4e;
-  border-radius: 16px;
+/* 지도 래퍼 */
+.map-wrap {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 300px;
+  overflow: visible; /* 오버레이 그림자/라운드 안 잘리게 */
 }
 
-.map-text {
-  font-size: 16px;
-  font-weight: bold;
-  color: #ff4e4e;
-  margin-top: 12px;
-  animation: fadeIn 1.5s ease-in-out infinite alternate;
+/* 카카오 지도 컨테이너 */
+.map-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-/* 간단한 스피너 애니메이션 */
-.map-spinner {
-  margin: 0 auto;
-  width: 32px;
-  height: 32px;
-  border: 4px solid #ffe1e1;
-  border-top: 4px solid #ff4e4e;
-  border-radius: 50%;
-  animation: spin 1.2s linear infinite;
+/* ===== 지도 위 오버레이 ===== */
+.overlay {
+  position: absolute;
+  top: 10px;
+  left: 16px;   /* 좌우 여백으로 검색창 폭 살짝 줄이기 */
+  right: 16px;
+  z-index: 10;
+  pointer-events: none; /* 자식만 클릭 가능 */
 }
 
-/* 회전 */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+/* 입력창 */
+.overlay-input { pointer-events: auto; }
+
+.overlay-input input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #111111;           /* 글자 검정 */
+  caret-color: #111111;
+  font-size: 15px;
+  line-height: 1.2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  outline: none;
 }
 
-/* 글씨 반짝이기 */
-@keyframes fadeIn {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 1;
-  }
+.overlay-input input::placeholder {
+  color: #9aa0a6;           /* placeholder 회색 */
+}
+
+/* 검색 결과 드롭다운 */
+.overlay-result-list {
+  margin-top: 8px;
+  list-style: none;
+  padding: 8px 0;
+  background: rgba(255,255,255,0.98);
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  max-height: 40vh;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.overlay-result-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.overlay-result-item:last-child { border-bottom: none; }
+.overlay-result-item:hover { background: #fafafa; }
+
+.overlay-result-item .item-line1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overlay-result-item .item-line1 strong {
+  font-weight: 700;
+  font-size: 14px;
+  flex: 1;
+}
+
+.overlay-result-item .wishlist-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.overlay-result-item .item-line2 {
+  color: #666;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* 예전 레이아웃 비활성화 (리스트가 지도 아래로 밀리던 UI 제거) */
+.search-content,
+.search-result-list,
+.search-result-item { display: none; }
+
+/* 리뷰 모달 (간단 스타일) */
+.review-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1000;
+}
+.review-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, 90vw);
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  z-index: 1001;
+}
+.review-close {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* iOS 노치 안전영역(선택) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .overlay { padding-top: env(safe-area-inset-top); }
 }
