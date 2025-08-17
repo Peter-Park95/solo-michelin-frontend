@@ -6,7 +6,9 @@ import axios from "axios";
 const HomePage = () => {
   const [allReviews, setAllReviews] = useState([]);
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
+  // 리뷰 데이터 불러오기
   useEffect(() => {
     axios
       .get("/api/reviews/highlights?limit=9")
@@ -14,50 +16,57 @@ const HomePage = () => {
       .catch((err) => console.error("리뷰 불러오기 실패", err));
   }, []);
 
+  // 자동 슬라이드
   useEffect(() => {
     if (allReviews.length < 9) return;
 
     const interval = setInterval(() => {
-      setCurrentSetIndex((prev) => (prev + 1) % 3); // 0 → 1 → 2 → 0 반복
+      if (!isPaused) {
+        setCurrentSetIndex((prev) => (prev + 1) % 3);
+      }
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [allReviews]);
+  }, [allReviews, isPaused]);
 
   const getCurrentReviewSet = () => {
     const start = currentSetIndex * 3;
     return allReviews.slice(start, start + 3);
   };
 
+  // 좋아요 토글 (낙관적 업데이트 + 실패 시 롤백)
   const handleLikeToggle = async (reviewId) => {
-    const token = localStorage.getItem("token"); // JWT 토큰 가져오기
-
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.error("JWT 토큰이 없습니다.");
+      alert("로그인이 필요합니다.");
       return;
     }
 
+    // 기존 상태 저장 (롤백용)
+    const prevReviews = [...allReviews];
+
+    // 즉시 UI 업데이트
+    setAllReviews((prev) =>
+      prev.map((r) =>
+        r.id === reviewId
+          ? {
+              ...r,
+              likedByMe: !r.likedByMe,
+              likeCount: (r.likeCount ?? 0) + (r.likedByMe ? -1 : 1),
+            }
+          : r
+      )
+    );
+
     try {
-      const updatedReviews = allReviews.map((r) => {
-        if (r.id !== reviewId) return r;
-
-        const liked = !r.likedByMe;
-        const currentCount = Number(r.likeCount) || 0;
-        const newCount = liked ? currentCount + 1 : currentCount - 1;
-
-        return { ...r, likedByMe: liked, likeCount: newCount };
-      });
-
-      // 서버 요청 (토큰을 포함한 헤더로 요청)
       await axios.post(`/api/review_like/${reviewId}`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      setAllReviews(updatedReviews);
     } catch (err) {
       console.error("좋아요 토글 실패", err);
+      // 실패 시 롤백
+      setAllReviews(prevReviews);
+      alert("좋아요 반영에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -81,12 +90,15 @@ const HomePage = () => {
 
       {/* 리뷰 하이라이트 */}
       {allReviews.length >= 9 && (
-        <div className="highlight-list-wrapper">
+        <div
+          className="highlight-list-wrapper"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           <div className="highlight-title">🔥 Hot Reviews</div>
           {getCurrentReviewSet().map((review, idx) => (
             <div className="highlight-card fade-in" key={idx}>
               <img src={review.imageUrl} alt="리뷰" />
-
               <div className="highlight-info">
                 <div className="highlight-top">
                   <strong>{review.restaurantName}</strong>

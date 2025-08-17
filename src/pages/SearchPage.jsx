@@ -140,23 +140,23 @@ const SearchPage = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
 
-const data = res.data;
-let docs = [];
-let meta = {};
+        const data = res.data;
+        let docs = [];
+        let meta = {};
 
-if (Array.isArray(data)) {
-  // BE가 List<PlaceDto>로 주는 경우
-  docs = data;
-  // 다음 페이지 유무는 서버에서 못 주니, 카카오 기준 페이지당 15개일 때의 휴리스틱(필요시 조정)
-  meta = { is_end: docs.length < 15 };
-} else {
-  // 카카오 원본 프록시 형태 (documents/meta)
-  docs = data?.documents ?? [];
-  meta = data?.meta ?? {};
-}
+        if (Array.isArray(data)) {
+          // BE가 List<PlaceDto>로 주는 경우
+          docs = data;
+          // 다음 페이지 유무는 서버에서 못 주니, 카카오 기준 페이지당 15개일 때의 휴리스틱(필요시 조정)
+          meta = { is_end: docs.length < 15 };
+        } else {
+          // 카카오 원본 프록시 형태 (documents/meta)
+          docs = data?.documents ?? [];
+          meta = data?.meta ?? {};
+        }
 
-setResults((prev) => (page === 1 ? docs : [...prev, ...docs]));
-setHasNextPage(meta.is_end === false);
+        setResults((prev) => (page === 1 ? docs : [...prev, ...docs]));
+        setHasNextPage(meta.is_end === false);
       } catch (err) {
         if (err.name === "CanceledError") return;
         console.error("검색 실패:", err);
@@ -330,6 +330,7 @@ setHasNextPage(meta.is_end === false);
                   onClick={() => {
                     setSelectedPlace(place);
                     setPlaceStats(null);
+                    // ▼ 드롭다운 닫기
                     setResults([]);
                     setHasNextPage(false);
                   }}
