@@ -356,12 +356,47 @@ const SearchPage = () => {
         <>
           <div className="review-popup-overlay" onClick={() => setReviewPopup(false)} />
           <div className="review-popup">
-            <button className="review-close" onClick={() => setReviewPopup(false)}>✕</button>
+            <button onClick={() => setReviewPopup(false)}>✕</button>
             <h3>리뷰 목록</h3>
             <ul>
               {reviewList.map((r, idx) => (
-                <li key={idx}>
-                  <strong>{r.userName}</strong>: {r.comment}
+                <li key={r.reviewId ?? idx} className="review-item">
+                  <div className="review-header" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <strong>{r.userName}</strong>
+                    <span className="review-rating">⭐ {r.rating.toFixed(1)}</span>
+                    <button
+                      className="like-button"
+                      style={{ cursor: "pointer", background: "none", border: "none", display: "flex", alignItems: "center", gap: "4px" }}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!userId) return alert("로그인 후 이용 가능합니다.");
+
+                        const prevLiked = r.liked;
+                        const prevCount = r.likeCount;
+
+                        // UI 즉시 반영
+                        r.liked = !r.liked;
+                        r.likeCount = r.liked ? r.likeCount + 1 : r.likeCount - 1;
+                        setReviewList([...reviewList]);
+                        try {
+                          await axios.post(`/api/review_like/${r.reviewId}`, null, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                          });
+                        } catch (err) {
+                          console.error("좋아요 요청 실패:", err);
+                          // 실패 시 롤백
+                          r.liked = prevLiked;
+                          r.likeCount = prevCount;
+                          setReviewList([...reviewList]);
+                          alert("좋아요 처리 실패");
+                        }
+                      }}
+                    >
+                      👍 {r.likeCount}
+                    </button>
+                  </div>
+                  <p>{r.comment}</p>
+                  {r.imageUrl && <img src={r.imageUrl} alt="리뷰 이미지" className="review-image" />}
                 </li>
               ))}
             </ul>
