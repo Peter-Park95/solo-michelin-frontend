@@ -133,6 +133,28 @@
   z-index: 1001;
 }
 
+.review-item {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-rating {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.review-image {
+  margin-top: 8px;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
 .review-close {
   position: absolute;
   right: 10px;
