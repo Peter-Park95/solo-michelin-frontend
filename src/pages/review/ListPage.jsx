@@ -10,6 +10,7 @@ function ListPage() {
   const [hasMore, setHasMore] = useState(true);
   const [filter, setFilter] = useState("latest");
   const [userId, setUserId] = useState(null); // userId 상태로 바꿈
+  const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
   const pageSize = 5;
 
@@ -38,6 +39,7 @@ function ListPage() {
           orderBy: filter === "latest" ? "created" : filter === "rating" ? "rating" : undefined,
           minRating: filter === "min4" ? 4.0 : undefined,
           category: filter === "korean" ? "한식" : filter === "japanese" ? "일식" : undefined,
+          search: searchText || undefined // 검색어 추가
         },
       });
 
@@ -112,7 +114,31 @@ return (
       </div>
 
       <div className="search-box">
-        <input type="text" placeholder="음식점을 검색하세요" />
+        <input
+          type="text"
+          placeholder="음식점을 검색하세요"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setPage(0);
+              setReviews([]);
+              setHasMore(true);
+              fetchReviews();   // ✅ 엔터 시 실행
+            }
+          }}
+        />
+        <button
+          className="search-button"
+          onClick={() => {
+            setPage(0);
+            setReviews([]);
+            setHasMore(true);
+            fetchReviews();   // ✅ 버튼 클릭 시 실행
+          }}
+        >
+          🔍
+        </button>
       </div>
 
       <div className="filter-buttons">

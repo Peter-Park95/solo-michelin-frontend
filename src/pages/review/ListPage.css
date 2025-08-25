@@ -28,14 +28,6 @@
   cursor: pointer;
 }
 
-.search-box input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 12px;
-}
-
 .filter-buttons {
   display: flex;
   gap: 6px;
@@ -148,4 +140,34 @@ list
 
 .mini-btn:hover {
   transform: scale(1.05);
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 40px 12px 12px; /* 🔍 버튼 자리 확보 */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.search-button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+}
+
+.search-button:hover {
+  color: #ff4d4d;
 }
