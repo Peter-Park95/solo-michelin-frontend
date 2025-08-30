@@ -26,20 +26,39 @@
 }
 
 .banner {
-  margin: 16px;
-  padding: 16px;
-  background-color: #222;
-  color: #fff;
+  position: relative;
+  width: 100%;
+  height: 250px; /* 원하는 배너 높이 */
+  overflow: hidden;
   border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .banner img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지 꽉 채우기 */
+  display: block;
+}
+
+.banner-text {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.banner-text h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.banner-text p {
+  margin: 4px 0 0;
+  font-size: 14px;
 }
 
 .category-grid {
@@ -62,7 +81,6 @@
   margin-bottom: 8px;
 }
 
-
 .highlight-list-wrapper {
   margin: 32px 16px 0;
   padding: 8px 0;
@@ -83,8 +101,8 @@
 }
 
 .highlight-card img {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 8px;
   margin-right: 10px;
@@ -121,18 +139,41 @@
     transform: translateY(0);
   }
 }
+
 .highlight-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 16px;
   font-weight: bold;
-  color: #ff4e4e;
+  color: #ff4d4d;
   padding: 8px 12px 4px;
   border-bottom: 1px dashed #ffcccc;
   margin-bottom: 8px;
 }
+
+.fire-icon {
+  color: #ff4d4d;
+  font-size: 18px;
+  animation: flicker 1s infinite alternate;
+}
+
+@keyframes flicker {
+  0%   { opacity: 0.6; transform: scale(1); }
+  50%  { opacity: 1;   transform: scale(1.2); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+
 .highlight-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .username {
@@ -140,19 +181,41 @@
   color: #666;
 }
 
-.highlight-bottom {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 4px;
-}
-
 .like-button {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
-  color: #ff4e4e;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: transform 0.2s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.heart {
+  font-size: 18px;
+  color: #bbb;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.heart.filled {
+  color: #ff4d6d;
+}
+
+.like-count {
+  font-size: 13px;
+  color: #555;
+}
+.highlight-bottom {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 끝 */
+  margin-top: 6px;
+}
+
+.username {
+  font-size: 12px;
+  color: #666;
 }

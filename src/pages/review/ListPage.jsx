@@ -107,10 +107,10 @@ return (
 
     <div className="list-page">
       <div className="list-page-header">
-        <h2 className="list-title">내 맛집 리스트</h2>
-        <button className="add-button-top" onClick={() => navigate("/add-review")}>
-          + 추가하기
-        </button>
+        <h2 className="list-title">  내 맛집 리스트</h2>
+{/*         <button className="add-button-top" onClick={() => navigate("/add-review")}> */}
+{/*           + 추가하기 */}
+{/*         </button> */}
       </div>
 
       <div className="search-box">
